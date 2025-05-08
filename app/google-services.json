@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "819707860339",
+    "project_id": "pillreminderapp-f732f",
+    "storage_bucket": "pillreminderapp-f732f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819707860339:android:786cff9df8e06e54656106",
+        "android_client_info": {
+          "package_name": "com.example.Pill_Reminder_App"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKV678Q_e7enrwERusef0itEPdWDX52VI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819707860339:android:26b9e8032871d267656106",
+        "android_client_info": {
+          "package_name": "com.example.mobile_proje_odevi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKV678Q_e7enrwERusef0itEPdWDX52VI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
