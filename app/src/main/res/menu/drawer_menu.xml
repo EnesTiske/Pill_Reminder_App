@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_calendar" android:icon="@drawable/ic_calendar" android:title="Takvim" />
+    <item android:id="@+id/nav_rewards" android:icon="@drawable/ic_rewards" android:title="Ödüller" />
+    <item android:id="@+id/nav_address" android:icon="@drawable/ic_address" android:title="Adresler" />
+    <item android:id="@+id/nav_payments" android:icon="@drawable/ic_payments" android:title="Ödeme Yöntemleri" />
+    <item android:id="@+id/nav_offers" android:icon="@drawable/ic_offers" android:title="Teklifler" />
+    <item android:id="@+id/nav_refer" android:icon="@drawable/ic_refer" android:title="Arkadaşını Davet Et" />
+    <item android:id="@+id/nav_support" android:icon="@drawable/ic_support" android:title="Destek" />
+    <item android:id="@+id/nav_theme" android:title="Renk Teması">
+        <menu>
+            <item android:id="@+id/theme_light" android:title="Açık" />
+            <item android:id="@+id/theme_dark" android:title="Koyu" />
+        </menu>
+    </item>
+</menu> 
