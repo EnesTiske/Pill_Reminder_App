@@ -1,11 +1,16 @@
 package com.example.Pill_Reminder_App;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -15,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -23,6 +30,11 @@ public class HomeFragment extends Fragment {
     private Calendar selectedDate = Calendar.getInstance();
     private LinearLayout layoutDays;
     private TextView tvDayName, tvDate;
+    private FloatingActionButton fab, fabAddMedicine, fabAddAlarm;
+
+    private LinearLayout layoutAddMedicine, layoutAddAlarm;
+
+    private boolean isFabOpen = false;
 
     @Nullable
     @Override
@@ -32,6 +44,25 @@ public class HomeFragment extends Fragment {
         layoutDays = view.findViewById(R.id.layoutDays);
         tvDayName = view.findViewById(R.id.tvDayName);
         tvDate = view.findViewById(R.id.tvDate);
+
+        // FAB'ları başlat
+        fab = view.findViewById(R.id.fab);
+        fabAddMedicine = view.findViewById(R.id.fabAddMedicine);
+        fabAddAlarm = view.findViewById(R.id.fabAddAlarm);
+
+        // FAB tıklama olayı
+        fab.setOnClickListener(v -> toggleFab());
+
+        // Alt FAB'ların tıklama olayları
+        fabAddMedicine.setOnClickListener(v -> {
+            // İlaç ekleme işlemi
+            toggleFab();
+        });
+
+        fabAddAlarm.setOnClickListener(v -> {
+            // Alarm ekleme işlemi
+            toggleFab();
+        });
 
         Button btnToday = view.findViewById(R.id.btnToday);
         ImageButton btnPrevWeek = view.findViewById(R.id.btnPrevWeek);
@@ -55,6 +86,74 @@ public class HomeFragment extends Fragment {
         updateCalendar();
         return view;
     }
+
+    private void toggleFab() {
+        if (isFabOpen) {
+            // KAPANMA animasyonları
+            AnimatorSet animatorSet = new AnimatorSet();
+
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(fabAddMedicine, "scaleX", 1f, 0f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(fabAddMedicine, "scaleY", 1f, 0f);
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(fabAddMedicine, "alpha", 1f, 0f);
+            ObjectAnimator translateY = ObjectAnimator.ofFloat(fabAddMedicine, "translationY", -480f, 0f);
+
+            ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(fabAddAlarm, "scaleX", 1f, 0f);
+            ObjectAnimator scaleY2 = ObjectAnimator.ofFloat(fabAddAlarm, "scaleY", 1f, 0f);
+            ObjectAnimator alpha2 = ObjectAnimator.ofFloat(fabAddAlarm, "alpha", 1f, 0f);
+            ObjectAnimator translateY2 = ObjectAnimator.ofFloat(fabAddAlarm, "translationY", -240f, 0f);
+
+            animatorSet.playTogether(scaleX, scaleY, alpha, translateY, scaleX2, scaleY2, alpha2, translateY2);
+            animatorSet.setDuration(300);
+            animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+
+            // Animasyon bitince görünmez yap
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    fabAddMedicine.setVisibility(View.GONE);
+                    fabAddAlarm.setVisibility(View.GONE);
+                }
+            });
+
+            animatorSet.start();
+            fab.animate().rotation(0f).setDuration(300).start();
+
+        } else {
+            // AÇILMA animasyonları
+            fabAddMedicine.setVisibility(View.VISIBLE);
+            fabAddAlarm.setVisibility(View.VISIBLE);
+
+            fabAddMedicine.setAlpha(0f);
+            fabAddAlarm.setAlpha(0f);
+            fabAddMedicine.setScaleX(0f);
+            fabAddMedicine.setScaleY(0f);
+            fabAddAlarm.setScaleX(0f);
+            fabAddAlarm.setScaleY(0f);
+
+            AnimatorSet animatorSet = new AnimatorSet();
+
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(fabAddMedicine, "scaleX", 0f, 1f);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(fabAddMedicine, "scaleY", 0f, 1f);
+            ObjectAnimator alpha = ObjectAnimator.ofFloat(fabAddMedicine, "alpha", 0f, 1f);
+            ObjectAnimator translateY = ObjectAnimator.ofFloat(fabAddMedicine, "translationY", 0f, -480f);
+
+            ObjectAnimator scaleX2 = ObjectAnimator.ofFloat(fabAddAlarm, "scaleX", 0f, 1f);
+            ObjectAnimator scaleY2 = ObjectAnimator.ofFloat(fabAddAlarm, "scaleY", 0f, 1f);
+            ObjectAnimator alpha2 = ObjectAnimator.ofFloat(fabAddAlarm, "alpha", 0f, 1f);
+            ObjectAnimator translateY2 = ObjectAnimator.ofFloat(fabAddAlarm, "translationY", 0f, -240f);
+
+            animatorSet.playTogether(scaleX, scaleY, alpha, translateY, scaleX2, scaleY2, alpha2, translateY2);
+            animatorSet.setDuration(300);
+            animatorSet.setInterpolator(new AccelerateDecelerateInterpolator());
+            animatorSet.start();
+
+            fab.animate().rotation(45f).setDuration(300).start();
+        }
+
+        isFabOpen = !isFabOpen;
+    }
+
+
 
     private void updateCalendar() {
 
@@ -109,4 +208,4 @@ public class HomeFragment extends Fragment {
                 && a.get(Calendar.DAY_OF_YEAR)==b.get(Calendar.DAY_OF_YEAR);
     }
 
-} 
+}
