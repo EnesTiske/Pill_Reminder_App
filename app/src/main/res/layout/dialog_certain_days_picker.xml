@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Günleri seçin"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/daysContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView android:id="@+id/dayMon" style="@style/DayBox" android:text="Pazartesi"/>
+        <TextView android:id="@+id/dayTue" style="@style/DayBox" android:text="Salı"/>
+        <TextView android:id="@+id/dayWed" style="@style/DayBox" android:text="Çarşamba"/>
+        <TextView android:id="@+id/dayThu" style="@style/DayBox" android:text="Perşembe"/>
+        <TextView android:id="@+id/dayFri" style="@style/DayBox" android:text="Cuma"/>
+        <TextView android:id="@+id/daySat" style="@style/DayBox" android:text="Cumartesi"/>
+        <TextView android:id="@+id/daySun" style="@style/DayBox" android:text="Pazar"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="16dp">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="İptal" />
+
+        <Button
+            android:id="@+id/btnContinue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Devam"
+            android:layout_marginStart="16dp"/>
+    </LinearLayout>
+</LinearLayout>

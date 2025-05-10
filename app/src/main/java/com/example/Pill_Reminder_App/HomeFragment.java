@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -32,8 +33,6 @@ public class HomeFragment extends Fragment {
     private TextView tvDayName, tvDate;
     private FloatingActionButton fab, fabAddMedicine, fabAddAlarm;
 
-    private LinearLayout layoutAddMedicine, layoutAddAlarm;
-
     private boolean isFabOpen = false;
 
     @Nullable
@@ -55,7 +54,8 @@ public class HomeFragment extends Fragment {
 
         // Alt FAB'ların tıklama olayları
         fabAddMedicine.setOnClickListener(v -> {
-            // İlaç ekleme işlemi
+            Intent intent = new Intent(getActivity(), AddMedicineActivity.class);
+            startActivity(intent);
             toggleFab();
         });
 

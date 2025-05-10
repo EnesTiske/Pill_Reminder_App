@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5"
+    android:paddingLeft="24dp"
+    android:paddingRight="24dp"
+    android:paddingTop="16dp"
+    >
+
+        <TextView android:id="@+id/optionHap" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Hap" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionEnjeksiyon" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Enjeksiyon" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionCozelti" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Çözelti (Sıvı)" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionDamla" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Damla" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionInhaler" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="İnhaler" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionToz" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Toz" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+        <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
+        <TextView android:id="@+id/optionDiger" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Diğer" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+    </LinearLayout>

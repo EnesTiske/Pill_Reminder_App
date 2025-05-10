@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:hint="E-posta"
+        android:text="t@gmail.com"
         android:inputType="textEmailAddress"
         android:minHeight="48dp" />
 
@@ -29,6 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:hint="Şifre"
+        android:text="asdqwe"
         android:inputType="textPassword"
         android:minHeight="48dp" />
 

@@ -185,12 +185,5 @@
         android:visibility="gone"
         app:fabSize="mini" />
 
-
-
-
-
-
-
-
 </FrameLayout>
 
