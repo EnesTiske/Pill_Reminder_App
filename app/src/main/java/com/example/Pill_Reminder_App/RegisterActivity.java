@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +20,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.Pill_Reminder_App.data.dto.UserDTO;
+import com.example.Pill_Reminder_App.data.repository.UserRepository;
+import com.example.Pill_Reminder_App.domain.service.UserService;
+
 public class RegisterActivity extends AppCompatActivity {
     private EditText nameInput;
     private EditText emailInput;
@@ -26,6 +32,8 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView loginLink;
     private FirebaseFirestore db;
+    private RadioGroup userTypeRadioGroup;
+    private RadioButton radioDoctor, radioPatient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
         registerButton = findViewById(R.id.registerButton);
         loginLink = findViewById(R.id.loginLink);
+        userTypeRadioGroup = findViewById(R.id.userTypeRadioGroup);
+        radioDoctor = findViewById(R.id.radioDoctor);
+        radioPatient = findViewById(R.id.radioPatient);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,6 +59,17 @@ public class RegisterActivity extends AppCompatActivity {
                 String email = emailInput.getText().toString().trim();
                 String password = passwordInput.getText().toString();
                 String confirmPassword = confirmPasswordInput.getText().toString();
+
+                int selectedId = userTypeRadioGroup.getCheckedRadioButtonId();
+                String userType;
+                if (selectedId == R.id.radioDoctor) {
+                    userType = "doctor";
+                } else if (selectedId == R.id.radioPatient) {
+                    userType = "patient";
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Kullanıcı tipini seçin", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "Lütfen tüm alanları doldurun", Toast.LENGTH_SHORT).show();
@@ -64,58 +86,17 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                // Önce email'in kullanımda olup olmadığını kontrol et
-                db.collection("users")
-                    .whereEqualTo("email", email)
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        if (!queryDocumentSnapshots.isEmpty()) {
-                            Toast.makeText(RegisterActivity.this, "Bu email adresi zaten kullanımda", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // Email kullanımda değilse kayıt işlemine devam et
-                            String hashedPassword = hashPassword(password);
-                            
-                            // Yeni kullanıcı dokümanı oluştur
-                            Map<String, Object> user = new HashMap<>();
-                            user.put("name", name);
-                            user.put("email", email);
-                            user.put("hashedPassword", hashedPassword);
-                            user.put("createdAt", System.currentTimeMillis());
-
-                            // Kullanıcıyı Firestore'a kaydet
-                            db.collection("users").add(user)
-                                .addOnSuccessListener(documentReference -> {
-                                    String userId = documentReference.getId();
-                                    
-                                    // Kullanıcı ayarlarını oluştur
-                                    Map<String, Object> userSettings = new HashMap<>();
-                                    userSettings.put("notificationsEnabled", true);
-                                    userSettings.put("theme", "light");
-                                    
-                                    db.collection("users").document(userId)
-                                        .collection("settings").document("preferences")
-                                        .set(userSettings)
-                                        .addOnSuccessListener(aVoid -> {
-                                            Toast.makeText(RegisterActivity.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
-                                            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                            startActivity(intent);
-                                            finish();
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            Toast.makeText(RegisterActivity.this, "Ayarlar kaydedilemedi: " + e.getMessage(),
-                                                    Toast.LENGTH_SHORT).show();
-                                        });
-                                })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(RegisterActivity.this, "Kayıt başarısız: " + e.getMessage(),
-                                            Toast.LENGTH_SHORT).show();
-                                });
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(RegisterActivity.this, "Veritabanı hatası: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show();
-                    });
+                UserDTO userDTO = new UserDTO(name, email, password, userType);
+                UserService userService = new UserService(new UserRepository());
+                userService.add(userDTO,
+                    unused -> {
+                        Toast.makeText(RegisterActivity.this, "Kayıt başarılı!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    },
+                    e -> Toast.makeText(RegisterActivity.this, "Kayıt başarısız: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
             }
         });
 
@@ -129,22 +110,5 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private String hashPassword(String password) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 } 
