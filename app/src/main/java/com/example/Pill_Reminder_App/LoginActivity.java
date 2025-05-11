@@ -62,28 +62,35 @@ public class LoginActivity extends AppCompatActivity {
                             String inputHashedPassword = hashPassword(password);
                             if (inputHashedPassword != null && inputHashedPassword.equals(hashedPassword)) {
                                 // Giriş başarılı
-                                // Kullanıcı ayarlarını kontrol et
-                                db.collection("users").document(userId)
-                                    .collection("settings").document("preferences").get()
-                                    .addOnSuccessListener(settingsSnapshot -> {
-                                        if (!settingsSnapshot.exists()) {
-                                            // Ayarlar yoksa varsayılan ayarları oluştur
-                                            Map<String, Object> userSettings = new HashMap<>();
-                                            userSettings.put("notificationsEnabled", true);
-                                            userSettings.put("theme", "light");
+                                String userType = queryDocumentSnapshots.getDocuments().get(0).getString("userType");
+                                if ("doctor".equals(userType)) {
+                                    Intent intent = new Intent(LoginActivity.this, com.example.Pill_Reminder_App.ui.doctor.DoctorHomeActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    // Kullanıcı ayarlarını kontrol et
+                                    db.collection("users").document(userId)
+                                        .collection("settings").document("preferences").get()
+                                        .addOnSuccessListener(settingsSnapshot -> {
+                                            if (!settingsSnapshot.exists()) {
+                                                // Ayarlar yoksa varsayılan ayarları oluştur
+                                                Map<String, Object> userSettings = new HashMap<>();
+                                                userSettings.put("notificationsEnabled", true);
+                                                userSettings.put("theme", "light");
+                                                
+                                                db.collection("users").document(userId)
+                                                    .collection("settings").document("preferences")
+                                                    .set(userSettings);
+                                            }
                                             
-                                            db.collection("users").document(userId)
-                                                .collection("settings").document("preferences")
-                                                .set(userSettings);
-                                        }
-                                        
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(LoginActivity.this, "Ayarlar yüklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                    });
+                                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                            startActivity(intent);
+                                            finish();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(LoginActivity.this, "Ayarlar yüklenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                                }
                             } else {
                                 // Şifre yanlış
                                 Toast.makeText(LoginActivity.this, "Email veya şifre hatalı", Toast.LENGTH_SHORT).show();

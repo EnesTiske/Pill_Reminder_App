@@ -12,10 +12,11 @@ public class Medicine {
     private IntakeTime intakeTime;
     private String code;
     private String doctorId; // nullable
+    private String userId; // ilacın bağlı olduğu kullanıcı (hasta) id'si
 
     public Medicine() {}
 
-    public Medicine(String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId) {
+    public Medicine(String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId, String userId) {
         this.name = name;
         this.form = form;
         this.frequency = frequency;
@@ -24,6 +25,7 @@ public class Medicine {
         this.intakeTime = intakeTime;
         this.code = code;
         this.doctorId = doctorId;
+        this.userId = userId;
     }
 
     public String getName() { return name; }
@@ -49,4 +51,7 @@ public class Medicine {
 
     public String getDoctorId() { return doctorId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 } 

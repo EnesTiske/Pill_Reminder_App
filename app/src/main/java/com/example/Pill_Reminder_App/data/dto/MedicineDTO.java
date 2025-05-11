@@ -12,16 +12,19 @@ public class MedicineDTO {
     private List<DoseTimeDTO> doseTimes;
     private String intakeTime;
     private String code;
+    private String userId;
 
     public MedicineDTO() {}
 
-    public MedicineDTO(String name, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String code, String doctorId) {
+
+    public MedicineDTO(String name, String doctorId, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String code, String userId) {
         this.name = name;
         this.form = form;
         this.frequency = frequency;
         this.startDate = startDate;
         this.doseTimes = doseTimes;
         this.intakeTime = intakeTime;
+        this.userId = userId;
         this.code = code;
         this.doctorId = doctorId;
     }
@@ -33,6 +36,8 @@ public class MedicineDTO {
         this.startDate = startDate;
         this.doseTimes = doseTimes;
         this.intakeTime = intakeTime;
+        this.userId = userId;
+
     }
 
     public String getName() { return name; }
@@ -58,4 +63,7 @@ public class MedicineDTO {
 
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 } 
