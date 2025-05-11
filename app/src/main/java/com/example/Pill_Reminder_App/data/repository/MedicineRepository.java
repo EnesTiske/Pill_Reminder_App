@@ -22,13 +22,13 @@ public class MedicineRepository extends GenericRepository<Medicine, MedicineDTO>
         }
         return new MedicineDTO(
             entity.getName(),
-            entity.getDoctorId(),
             entity.getForm() != null ? entity.getForm().name() : null,
             entity.getFrequency(),
             entity.getStartDate(),
             doseTimeDTOs,
             entity.getIntakeTime() != null ? entity.getIntakeTime().name() : null,
-            entity.getCode()
+            entity.getCode(),
+            entity.getDoctorId()
         );
     }
 } 

@@ -57,7 +57,23 @@ public class MedicineService implements IService<MedicineDTO> {
             }
         }
         MedicineForm form = dto.getForm() != null ? MedicineForm.valueOf(dto.getForm()) : null;
-        IntakeTime intakeTime = dto.getIntakeTime() != null ? IntakeTime.valueOf(dto.getIntakeTime()) : null;
+        IntakeTime intakeTime = null;
+        if (dto.getIntakeTime() != null) {
+            switch (dto.getIntakeTime()) {
+                case "Yemekten önce":
+                    intakeTime = IntakeTime.YEMEK_ONCE;
+                    break;
+                case "Yemek sırasında":
+                    intakeTime = IntakeTime.YEMEK_SINIRDA;
+                    break;
+                case "Yemekten sonra":
+                    intakeTime = IntakeTime.YEMEK_SONRA;
+                    break;
+                case "Farketmez":
+                    intakeTime = IntakeTime.FARKETMEZ;
+                    break;
+            }
+        }
         return new Medicine(
             dto.getName(),
             form,

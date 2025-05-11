@@ -1,6 +1,7 @@
 package com.example.Pill_Reminder_App;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -39,6 +40,7 @@ public class AddMedicineActivity extends AppCompatActivity {
         medicineService = new MedicineService(repository);
         medicineDTO = new MedicineDTO();
         medicineDTO.setDoseTimes(new ArrayList<>());
+        medicineDTO.setCode(String.valueOf(System.currentTimeMillis())); // Benzersiz kod oluştur
 
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
@@ -135,6 +137,16 @@ public class AddMedicineActivity extends AppCompatActivity {
     }
 
     private void saveMedicine() {
+        // DTO'yu konsola yazdır
+        Log.d("MedicineDTO", "İlaç bilgileri: " +
+            "\nİsim: " + medicineDTO.getName() +
+            "\nForm: " + medicineDTO.getForm() +
+            "\nSıklık: " + medicineDTO.getFrequency() +
+            "\nBaşlangıç Tarihi: " + medicineDTO.getStartDate() +
+            "\nYemek Zamanı: " + medicineDTO.getIntakeTime() +
+            "\nKod: " + medicineDTO.getCode() +
+            "\nDoz Zamanları: " + medicineDTO.getDoseTimes());
+
         medicineService.add(
                 medicineDTO,
                 unused -> {
