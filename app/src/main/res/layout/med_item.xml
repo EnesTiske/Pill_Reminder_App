@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="#E6F3FB"
+    android:padding="12dp"
+    android:layout_marginVertical="8dp"
+    android:layout_marginHorizontal="4dp"
+    android:gravity="center_vertical"
+    android:elevation="2dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_medicines"
+        android:contentDescription="İlaç İkonu" />
+
+    <View
+        android:layout_width="12dp"
+        android:layout_height="0dp" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvMedName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MediCue name"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="#222" />
+
+        <TextView
+            android:id="@+id/tvMedAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Medi amount"
+            android:textSize="15sp"
+            android:textColor="#444" />
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/cbTaken"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:buttonTint="#2B4D66"/>
+</LinearLayout> 

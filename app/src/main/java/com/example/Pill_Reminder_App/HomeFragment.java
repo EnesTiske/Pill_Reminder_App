@@ -6,6 +6,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +28,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Arrays;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
     private Calendar selectedDate = Calendar.getInstance();
@@ -84,6 +88,7 @@ public class HomeFragment extends Fragment {
         });
 
         updateCalendar();
+        populateMedicineList(view);
         return view;
     }
 
@@ -153,10 +158,7 @@ public class HomeFragment extends Fragment {
         isFabOpen = !isFabOpen;
     }
 
-
-
     private void updateCalendar() {
-
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
         tvDate.setText(dateFormat.format(selectedDate.getTime()));
@@ -208,4 +210,56 @@ public class HomeFragment extends Fragment {
                 && a.get(Calendar.DAY_OF_YEAR)==b.get(Calendar.DAY_OF_YEAR);
     }
 
+    private void populateMedicineList(View rootView) {
+        LinearLayout layoutMeds = rootView.findViewById(R.id.layoutMeds);
+        layoutMeds.removeAllViews();
+
+        // Örnek veri: saat, ilaç adı, miktar
+        class Med {
+            String time, name, amount;
+            Med(String t, String n, String a) { time = t; name = n; amount = a; }
+        }
+        List<Med> meds = Arrays.asList(
+            new Med("12:00", "Parol", "1 tablet"),
+            new Med("12:00", "Aferin", "2 tablet"),
+            new Med("12:00", "Vitamin C", "1 kapsül"),
+            new Med("15:00", "Parol", "1 tablet"),
+            new Med("15:00", "Aferin", "2 tablet"),
+            new Med("18:00", "Parol", "1 tablet"),
+            new Med("18:00", "Aferin", "2 tablet"),
+            new Med("21:00", "Parol", "1 tablet"),
+            new Med("21:00", "Aferin", "2 tablet"),
+            new Med("24:00", "Parol", "1 tablet"),
+            new Med("24:00", "Aferin", "2 tablet")
+        );
+
+        String lastTime = "";
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        for (Med med : meds) {
+            if (!med.time.equals(lastTime)) {
+                // Saat başlığı ekle
+                View header = inflater.inflate(R.layout.med_time_header, layoutMeds, false);
+                ((TextView)header.findViewById(R.id.tvTimeHeader)).setText(med.time);
+                layoutMeds.addView(header);
+                lastTime = med.time;
+            }
+            // İlaç kutusu ekle
+            View medItem = inflater.inflate(R.layout.med_item, layoutMeds, false);
+            TextView tvMedName = medItem.findViewById(R.id.tvMedName);
+            TextView tvMedAmount = medItem.findViewById(R.id.tvMedAmount);
+            tvMedName.setText(med.name);
+            tvMedAmount.setText(med.amount);
+            CheckBox cbTaken = medItem.findViewById(R.id.cbTaken);
+            cbTaken.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    tvMedName.setPaintFlags(tvMedName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    tvMedName.setPaintFlags(tvMedName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                }
+            });
+            layoutMeds.addView(medItem);
+        }
+    }
 }

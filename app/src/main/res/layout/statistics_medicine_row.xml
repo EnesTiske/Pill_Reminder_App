@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="4dp">
+
+    <View
+        android:id="@+id/statusDot"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/statistics_dot_bg" />
+
+    <TextView
+        android:id="@+id/tvMedicineName"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:text="Parol 1 tablet"
+        android:textSize="16sp"
+        android:textColor="#222"/>
+
+    <FrameLayout
+        android:layout_width="60dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="12dp">
+        <View
+            android:id="@+id/miniBarRed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FF5A5A"/>
+        <View
+            android:id="@+id/miniBarGreen"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:background="#4CAF50"/>
+    </FrameLayout>
+</LinearLayout> 
