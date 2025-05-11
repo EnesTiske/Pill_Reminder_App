@@ -1,6 +1,7 @@
 package com.example.Pill_Reminder_App;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -20,6 +21,7 @@ import com.example.Pill_Reminder_App.data.dto.DoseTimeDTO;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class AddMedicineActivity extends AppCompatActivity {
     private int currentStep = 1;
@@ -144,6 +146,14 @@ public class AddMedicineActivity extends AppCompatActivity {
             "\nYemek Zamanı: " + medicineDTO.getIntakeTime() +
             "\nKod: " + medicineDTO.getCode() +
             "\nDoz Zamanları: " + medicineDTO.getDoseTimes());
+
+                    // Giriş yapan doktorun id'sini/emailini al (örnek: email, gerçek projede Auth ile alınmalı)
+        String doctorId = "doctor@example.com"; // TODO: Giriş yapan doktorun id/emailini dinamik al
+        String userId = null; // TODO: Eğer hasta seçiliyorsa, onun id'si atanmalı
+        String uniqueCode = UUID.randomUUID().toString().substring(0, 8); // 8 karakterlik benzersiz kod
+        medicineDTO.setDoctorId(doctorId);
+        medicineDTO.setUserId(userId);
+        medicineDTO.setCode(uniqueCode);
 
         medicineService.add(
                 medicineDTO,

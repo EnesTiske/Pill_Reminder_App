@@ -17,19 +17,19 @@ public class MedicineDTO {
     public MedicineDTO() {}
 
 
-    public MedicineDTO(String name, String doctorId, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String code, String userId) {
+    public MedicineDTO(String name, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String code, String doctorId, String userId) {
         this.name = name;
         this.form = form;
         this.frequency = frequency;
         this.startDate = startDate;
         this.doseTimes = doseTimes;
         this.intakeTime = intakeTime;
-        this.userId = userId;
         this.code = code;
         this.doctorId = doctorId;
+        this.userId = userId;
     }
 
-    public MedicineDTO(String name, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime) {
+    public MedicineDTO(String name, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String userId) {
         this.name = name;
         this.form = form;
         this.frequency = frequency;

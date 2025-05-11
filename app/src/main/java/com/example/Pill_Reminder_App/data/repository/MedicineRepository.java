@@ -27,7 +27,6 @@ public class MedicineRepository extends GenericRepository<Medicine, MedicineDTO>
             entity.getStartDate(),
             doseTimeDTOs,
             entity.getIntakeTime() != null ? entity.getIntakeTime().name() : null,
-            // entity.getIntakeTime() != null ? entity.getIntakeTime().name() : null,
             entity.getCode(),
             entity.getDoctorId(),
             entity.getUserId()

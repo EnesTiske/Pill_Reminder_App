@@ -61,15 +61,19 @@ public class MedicineService implements IService<MedicineDTO> {
         if (dto.getIntakeTime() != null) {
             switch (dto.getIntakeTime()) {
                 case "Yemekten önce":
+                case "YEMEK_ONCE":
                     intakeTime = IntakeTime.YEMEK_ONCE;
                     break;
                 case "Yemek sırasında":
-                    intakeTime = IntakeTime.YEMEK_SINIRDA;
+                case "YEMEK_SIRASINRDA":
+                    intakeTime = IntakeTime.YEMEK_SIRASINRDA;
                     break;
                 case "Yemekten sonra":
+                case "YEMEK_SONRA":
                     intakeTime = IntakeTime.YEMEK_SONRA;
                     break;
                 case "Farketmez":
+                case "FARKETMEZ":
                     intakeTime = IntakeTime.FARKETMEZ;
                     break;
             }
