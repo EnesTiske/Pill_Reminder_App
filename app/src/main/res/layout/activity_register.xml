@@ -50,6 +50,27 @@
         android:inputType="textPassword"
         android:minHeight="48dp" />
 
+    <RadioGroup
+        android:id="@+id/userTypeRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/radioDoctor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Doktor" />
+
+        <RadioButton
+            android:id="@+id/radioPatient"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hasta" />
+    </RadioGroup>
+
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"

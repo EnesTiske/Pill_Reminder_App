@@ -45,7 +45,25 @@ public class UserService implements IService<UserDTO> {
 
     // DTO -> Entity
     private User fromDTO(UserDTO dto) {
-        return new User(dto.getName(), dto.getEmail(), dto.getPassword(), dto.getUserType());
+        String hashedPassword = hashPassword(dto.getPassword());
+        return new User(dto.getName(), dto.getEmail(), hashedPassword, dto.getUserType());
+    }
+
+    private String hashPassword(String password) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     // Entity -> Map (Firestore için)
