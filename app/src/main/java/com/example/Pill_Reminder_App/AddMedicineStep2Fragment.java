@@ -48,6 +48,11 @@ public class AddMedicineStep2Fragment extends Fragment {
             }
         }
         selectedIndex = index;
-        // Seçilen değeri burada kullanabilirsin
+        
+        // Seçilen formu ana aktiviteye bildir
+        if (getActivity() instanceof AddMedicineActivity) {
+            String selectedForm = options[index].getText().toString().toUpperCase();
+            ((AddMedicineActivity) getActivity()).setMedicineForm(selectedForm);
+        }
     }
 } 

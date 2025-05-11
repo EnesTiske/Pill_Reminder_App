@@ -19,6 +19,7 @@ import android.widget.CheckBox;
 public class AddMedicineStep3Fragment extends Fragment {
     private TextView[] options;
     private int selectedIndex = -1;
+    private String selectedFrequency = "";
 
     @Nullable
     @Override
@@ -52,6 +53,7 @@ public class AddMedicineStep3Fragment extends Fragment {
             }
         }
         selectedIndex = index;
+        
         if (index == 1) {
             showCertainDaysDialog();
         } else {
@@ -74,9 +76,31 @@ public class AddMedicineStep3Fragment extends Fragment {
         numberPicker.setWrapSelectorWheel(false);
         numberPicker.setValue(1);
 
-
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnContinue.setOnClickListener(v -> {
+            int value = numberPicker.getValue();
+            String frequency = "";
+            
+            switch (selectedIndex) {
+                case 0: // Her gün
+                    frequency = "Her gün";
+                    break;
+                case 2: // X günde bir
+                    frequency = value + " günde bir";
+                    break;
+                case 3: // X haftada bir
+                    frequency = value + " haftada bir";
+                    break;
+                case 4: // X ayda bir
+                    frequency = value + " ayda bir";
+                    break;
+            }
+            
+            selectedFrequency = frequency;
+            if (getActivity() instanceof AddMedicineActivity) {
+                ((AddMedicineActivity) getActivity()).setMedicineFrequency(frequency);
+            }
+            
             dialog.dismiss();
         });
 
@@ -114,13 +138,24 @@ public class AddMedicineStep3Fragment extends Fragment {
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
         btnContinue.setOnClickListener(v -> {
+            StringBuilder frequency = new StringBuilder("Belirli günler: ");
+            String[] dayNames = {"Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma", "Cumartesi", "Pazar"};
+            
+            for (int i = 0; i < selectedDays.length; i++) {
+                if (selectedDays[i]) {
+                    if (frequency.length() > 14) { // "Belirli günler: " uzunluğu
+                        frequency.append(", ");
+                    }
+                    frequency.append(dayNames[i]);
+                }
+            }
+            
+            selectedFrequency = frequency.toString();
+            if (getActivity() instanceof AddMedicineActivity) {
+                ((AddMedicineActivity) getActivity()).setMedicineFrequency(selectedFrequency);
+            }
+            
             dialog.dismiss();
-
-            requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, new AddMedicineStep4Fragment())
-                .addToBackStack(null)
-                .commit();
         });
 
         dialog.show();

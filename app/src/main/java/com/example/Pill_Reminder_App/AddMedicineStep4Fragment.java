@@ -9,6 +9,8 @@ import android.widget.DatePicker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import java.util.Calendar;
+import java.util.Date;
 
 public class AddMedicineStep4Fragment extends Fragment {
     @Nullable
@@ -19,10 +21,21 @@ public class AddMedicineStep4Fragment extends Fragment {
         DatePicker datePicker = view.findViewById(R.id.datePicker);
         Button btnNext = view.findViewById(R.id.btnNext);
 
+        // Minimum tarihi bugün olarak ayarla
+        Calendar calendar = Calendar.getInstance();
+        datePicker.setMinDate(calendar.getTimeInMillis());
+
         btnNext.setOnClickListener(v -> {
             int year = datePicker.getYear();
             int month = datePicker.getMonth();
             int day = datePicker.getDayOfMonth();
+            
+            calendar.set(year, month, day);
+            Date startDate = calendar.getTime();
+            
+            if (getActivity() instanceof AddMedicineActivity) {
+                ((AddMedicineActivity) getActivity()).setMedicineStartDate(startDate);
+            }
         });
 
         return view;
