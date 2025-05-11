@@ -1,0 +1,24 @@
+package com.example.Pill_Reminder_App.Models;
+
+public class DoseTime {
+    private String time; // "08:00" gibi
+    private int amount; // 1, 2, ...
+    private String unit; // "Hap", "ml" gibi
+
+    public DoseTime() {}
+
+    public DoseTime(String time, int amount, String unit) {
+        this.time = time;
+        this.amount = amount;
+        this.unit = unit;
+    }
+
+    public String getTime() { return time; }
+    public void setTime(String time) { this.time = time; }
+
+    public int getAmount() { return amount; }
+    public void setAmount(int amount) { this.amount = amount; }
+
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+} 
