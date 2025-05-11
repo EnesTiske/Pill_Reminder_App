@@ -66,7 +66,8 @@ public class MedicineService implements IService<MedicineDTO> {
             doseTimes,
             intakeTime,
             dto.getCode(),
-            dto.getDoctorId()
+            dto.getDoctorId(),
+            dto.getUserId()
         );
     }
 
@@ -80,6 +81,7 @@ public class MedicineService implements IService<MedicineDTO> {
         map.put("startDate", medicine.getStartDate());
         map.put("intakeTime", medicine.getIntakeTime() != null ? medicine.getIntakeTime().name() : null);
         map.put("code", medicine.getCode());
+        map.put("userId", medicine.getUserId());
         if (medicine.getDoseTimes() != null) {
             List<Map<String, Object>> doseList = new ArrayList<>();
             for (DoseTime d : medicine.getDoseTimes()) {
