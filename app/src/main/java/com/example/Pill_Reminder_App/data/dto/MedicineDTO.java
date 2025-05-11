@@ -16,7 +16,6 @@ public class MedicineDTO {
 
     public MedicineDTO() {}
 
-
     public MedicineDTO(String name, String form, String frequency, Date startDate, List<DoseTimeDTO> doseTimes, String intakeTime, String code, String doctorId, String userId) {
         this.name = name;
         this.form = form;
@@ -37,7 +36,6 @@ public class MedicineDTO {
         this.doseTimes = doseTimes;
         this.intakeTime = intakeTime;
         this.userId = userId;
-
     }
 
     public String getName() { return name; }
