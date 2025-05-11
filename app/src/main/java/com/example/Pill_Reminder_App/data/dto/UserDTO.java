@@ -1,4 +1,4 @@
-package com.example.Pill_Reminder_App.DTOs;
+package com.example.Pill_Reminder_App.data.dto;
 
 public class UserDTO {
     private String name;

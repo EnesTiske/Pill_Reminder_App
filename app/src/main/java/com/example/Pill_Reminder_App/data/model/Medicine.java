@@ -1,4 +1,4 @@
-package com.example.Pill_Reminder_App.Models;
+package com.example.Pill_Reminder_App.data.model;
 
 import java.util.Date;
 import java.util.List;
@@ -11,7 +11,7 @@ public class Medicine {
     private List<DoseTime> doseTimes;
     private IntakeTime intakeTime;
     private String code;
-    private String doctorId;
+    private String doctorId; // nullable
 
     public Medicine() {}
 

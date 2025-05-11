@@ -1,12 +1,13 @@
-package com.example.Pill_Reminder_App.Service;
+package com.example.Pill_Reminder_App.domain.service;
 
-import com.example.Pill_Reminder_App.DTOs.UserDTO;
-import com.example.Pill_Reminder_App.Models.User;
-import com.example.Pill_Reminder_App.Repository.UserRepository;
+import com.example.Pill_Reminder_App.data.dto.UserDTO;
+import com.example.Pill_Reminder_App.data.model.User;
+import com.example.Pill_Reminder_App.data.repository.UserRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 public class UserService implements IService<UserDTO> {
     private final UserRepository userRepository;
@@ -49,11 +50,11 @@ public class UserService implements IService<UserDTO> {
 
     // Entity -> Map (Firestore için)
     private Map<String, Object> toMap(User user) {
-        return new java.util.HashMap<String, Object>() {{
-            put("name", user.getName());
-            put("email", user.getEmail());
-            put("hashedPassword", user.getHashedPassword());
-            put("userType", user.getUserType());
-        }};
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", user.getName());
+        map.put("email", user.getEmail());
+        map.put("hashedPassword", user.getHashedPassword());
+        map.put("userType", user.getUserType());
+        return map;
     }
 } 

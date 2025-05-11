@@ -1,4 +1,4 @@
-package com.example.Pill_Reminder_App.Repository;
+package com.example.Pill_Reminder_App.data.repository;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -67,4 +67,4 @@ public abstract class GenericRepository<T, DTO> implements IGenericRepository<DT
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
-}
+} 

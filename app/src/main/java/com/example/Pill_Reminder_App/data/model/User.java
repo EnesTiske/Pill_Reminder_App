@@ -1,4 +1,4 @@
-package com.example.Pill_Reminder_App.Models;
+package com.example.Pill_Reminder_App.data.model;
 
 public class User {
     private String name;
