@@ -1,5 +1,6 @@
 package com.example.Pill_Reminder_App;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -20,6 +21,7 @@ import com.example.Pill_Reminder_App.data.dto.DoseTimeDTO;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 public class AddMedicineActivity extends AppCompatActivity {
     private int currentStep = 1;
@@ -135,12 +137,21 @@ public class AddMedicineActivity extends AppCompatActivity {
     }
 
     private void saveMedicine() {
+        // Giriş yapan doktorun id'sini/emailini al (örnek: email, gerçek projede Auth ile alınmalı)
+        String doctorId = "doctor@example.com"; // TODO: Giriş yapan doktorun id/emailini dinamik al
+        String userId = null; // TODO: Eğer hasta seçiliyorsa, onun id'si atanmalı
+        String uniqueCode = UUID.randomUUID().toString().substring(0, 8); // 8 karakterlik benzersiz kod
+        medicineDTO.setDoctorId(doctorId);
+        medicineDTO.setUserId(userId);
+        medicineDTO.setCode(uniqueCode);
         medicineService.add(
                 medicineDTO,
                 unused -> {
-                    // ✅ Başarılı işlem
-                    Toast.makeText(this, "İlaç başarıyla kaydedildi!", Toast.LENGTH_SHORT).show();
-                    finish(); // veya başka bir sayfaya geç
+                    // ✅ Başarılı işlem: kodu yeni ekrana ilet
+                    Intent intent = new Intent(this, com.example.Pill_Reminder_App.ui.doctor.MedicineCreatedActivity.class);
+                    intent.putExtra("medicineCode", uniqueCode);
+                    startActivity(intent);
+                    finish();
                 },
                 e -> {
                     // ❌ Hatalı işlem

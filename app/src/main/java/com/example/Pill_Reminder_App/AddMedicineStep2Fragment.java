@@ -1,58 +1,38 @@
 package com.example.Pill_Reminder_App;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.example.Pill_Reminder_App.data.model.MedicineForm;
 
 public class AddMedicineStep2Fragment extends Fragment {
-    private TextView[] options;
-    private int selectedIndex = -1;
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_medicine_step2, container, false);
-
-        options = new TextView[]{
-                view.findViewById(R.id.optionHap),
-                view.findViewById(R.id.optionEnjeksiyon),
-                view.findViewById(R.id.optionCozelti),
-                view.findViewById(R.id.optionDamla),
-                view.findViewById(R.id.optionInhaler),
-                view.findViewById(R.id.optionToz),
-                view.findViewById(R.id.optionDiger)
-        };
-
-        for (int i = 0; i < options.length; i++) {
-            final int index = i;
-            options[i].setOnClickListener(v -> selectOption(index));
-        }
-
-        return view;
-    }
-
-    private void selectOption(int index) {
-        for (int i = 0; i < options.length; i++) {
-            if (i == index) {
-                options[i].setBackgroundColor(Color.parseColor("#2196F3"));
-                options[i].setTextColor(Color.WHITE);
-            } else {
-                options[i].setBackgroundColor(Color.TRANSPARENT);
-                options[i].setTextColor(Color.BLACK);
+        Spinner spinner = view.findViewById(R.id.spinnerForm);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+            android.R.layout.simple_spinner_item,
+            java.util.Arrays.stream(MedicineForm.values()).map(Enum::name).toArray(String[]::new));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+                String selectedForm = MedicineForm.values()[position].name();
+                if (getActivity() instanceof AddMedicineActivity) {
+                    ((AddMedicineActivity) getActivity()).setMedicineForm(selectedForm);
+                }
             }
-        }
-        selectedIndex = index;
-        
-        // Seçilen formu ana aktiviteye bildir
-        if (getActivity() instanceof AddMedicineActivity) {
-            String selectedForm = options[index].getText().toString().toUpperCase();
-            ((AddMedicineActivity) getActivity()).setMedicineForm(selectedForm);
-        }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        return view;
     }
 } 
