@@ -21,12 +21,20 @@ public class AddMedicineStep6Fragment extends Fragment {
         TextView optionDoesntMatter = view.findViewById(R.id.optionDoesntMatter);
 
         View.OnClickListener listener = v -> {
-            // Seçim yapıldığında Step 7'ye geç
-            requireActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, new AddMedicineStep7Fragment())
-                .addToBackStack(null)
-                .commit();
+            String mealTime = "";
+            if (v == optionBefore) {
+                mealTime = "Yemekten önce";
+            } else if (v == optionDuring) {
+                mealTime = "Yemek sırasında";
+            } else if (v == optionAfter) {
+                mealTime = "Yemekten sonra";
+            } else if (v == optionDoesntMatter) {
+                mealTime = "Farketmez";
+            }
+
+            if (getActivity() instanceof AddMedicineActivity) {
+                ((AddMedicineActivity) getActivity()).setMedicineMealTime(mealTime);
+            }
         };
 
         optionBefore.setOnClickListener(listener);

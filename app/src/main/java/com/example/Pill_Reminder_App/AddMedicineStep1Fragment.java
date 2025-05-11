@@ -23,6 +23,17 @@ public class AddMedicineStep1Fragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         
         medicineNameEditText = view.findViewById(R.id.medicineNameEditText);
+        
+        // İlaç adı değiştiğinde ana aktiviteye bildir
+        medicineNameEditText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                String medicineName = medicineNameEditText.getText() != null ? 
+                    medicineNameEditText.getText().toString() : "";
+                if (getActivity() instanceof AddMedicineActivity) {
+                    ((AddMedicineActivity) getActivity()).setMedicineName(medicineName);
+                }
+            }
+        });
     }
 
     public String getMedicineName() {
