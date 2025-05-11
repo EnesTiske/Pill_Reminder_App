@@ -7,49 +7,17 @@
     android:padding="24dp">
 
     <TextView
-        android:id="@+id/optionBefore"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text="Yemekten önce"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="İlacın Alınma Zamanı"
         android:textSize="18sp"
-        android:background="?attr/selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
+        android:layout_marginBottom="12dp"/>
 
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-    <TextView
-        android:id="@+id/optionDuring"
+    <Spinner
+        android:id="@+id/spinnerMealTime"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text="Yemek sırasında"
-        android:textSize="18sp"
-        android:background="?attr/selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-    <TextView
-        android:id="@+id/optionAfter"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text="Yemekten sonra"
-        android:textSize="18sp"
-        android:background="?attr/selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
-
-    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0"/>
-    <TextView
-        android:id="@+id/optionDoesntMatter"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center_vertical"
-        android:text="Fark etmiyor"
-        android:textSize="18sp"
-        android:background="?attr/selectableItemBackground"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"/>
 </LinearLayout>

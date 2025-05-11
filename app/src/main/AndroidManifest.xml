@@ -32,6 +32,9 @@
         <activity
             android:name=".ui.doctor.DoctorHomeActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.doctor.MedicineCreatedActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

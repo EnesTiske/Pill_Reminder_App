@@ -1,7 +1,6 @@
 package com.example.Pill_Reminder_App;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -40,7 +39,6 @@ public class AddMedicineActivity extends AppCompatActivity {
         medicineService = new MedicineService(repository);
         medicineDTO = new MedicineDTO();
         medicineDTO.setDoseTimes(new ArrayList<>());
-        medicineDTO.setCode(String.valueOf(System.currentTimeMillis())); // Benzersiz kod oluştur
 
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
