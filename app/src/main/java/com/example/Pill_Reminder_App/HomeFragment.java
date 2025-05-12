@@ -159,8 +159,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void updateCalendar() {
-        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("tr", "TR"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy", new Locale("tr", "TR"));
         tvDate.setText(dateFormat.format(selectedDate.getTime()));
         tvDayName.setText(dayFormat.format(selectedDate.getTime()));
 

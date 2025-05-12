@@ -24,7 +24,7 @@
 
             <Button
                 android:id="@+id/btnToday"
-                android:text="Today"
+                android:text="Bugün"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
@@ -44,13 +44,6 @@
                 android:text="July 5, 2024"
                 android:textColor="#666"
                 android:textSize="14sp" />
-
-            <ImageButton
-                android:id="@+id/btnProfile"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:src="@drawable/ic_profile"
-                android:contentDescription="@string/app_name"/>
 
         </LinearLayout>
 
@@ -72,42 +65,14 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="S"
+                android:text="P"
                 android:textSize="12sp"/>
             <TextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="M"
-                android:textSize="12sp"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="T"
-                android:textSize="12sp"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="W"
-                android:textSize="12sp"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="T"
-                android:textSize="12sp"/>
-            <TextView
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="F"
+                android:text="P"
                 android:textSize="12sp"/>
             <TextView
                 android:layout_width="0dp"
@@ -115,6 +80,34 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="S"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Ç"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="P"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="C"
+                android:textSize="12sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="C"
                 android:textSize="12sp"/>
         </LinearLayout>
 

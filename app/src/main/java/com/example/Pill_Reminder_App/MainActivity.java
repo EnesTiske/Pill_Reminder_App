@@ -70,6 +70,15 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         if (savedInstanceState == null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
+
+        // Drawer header'daki kullanıcı adı ve mailini güncelle
+        if (navigationView != null) {
+            android.view.View headerView = navigationView.getHeaderView(0);
+            android.widget.TextView tvName = headerView.findViewById(R.id.profile_name);
+            android.widget.TextView tvEmail = headerView.findViewById(R.id.profile_email);
+            if (tvName != null) tvName.setText(sessionManager.getUserName());
+            if (tvEmail != null) tvEmail.setText(sessionManager.getUserEmail());
+        }
     }
 
     private void showCodeInputDialog() {
