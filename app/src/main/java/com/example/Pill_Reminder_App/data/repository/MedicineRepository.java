@@ -134,12 +134,38 @@ public class MedicineRepository {
         if (map.get("doseTimes") != null) {
             List<Map<String, Object>> doseList = (List<Map<String, Object>>) map.get("doseTimes");
             for (Map<String, Object> d : doseList) {
+                Object amountObj = d.get("amount");
+                double amount;
+                if (amountObj instanceof Long) {
+                    amount = ((Long) amountObj).doubleValue();
+                } else if (amountObj instanceof Double) {
+                    amount = (Double) amountObj;
+                } else {
+                    amount = 0.0;
+                }
+                
                 doseTimes.add(new DoseTimeDTO(
                     (String) d.get("time"),
-                    (Double) d.get("amount"),
+                    amount,
                     (String) d.get("unit")
                 ));
             }
+        }
+
+        Object startDateObj = map.get("startDate");
+        Date startDate = null;
+        if (startDateObj instanceof com.google.firebase.Timestamp) {
+            startDate = ((com.google.firebase.Timestamp) startDateObj).toDate();
+        } else if (startDateObj instanceof Date) {
+            startDate = (Date) startDateObj;
+        }
+
+        Object createdAtObj = map.get("createdAt");
+        Date createdAt = null;
+        if (createdAtObj instanceof com.google.firebase.Timestamp) {
+            createdAt = ((com.google.firebase.Timestamp) createdAtObj).toDate();
+        } else if (createdAtObj instanceof Date) {
+            createdAt = (Date) createdAtObj;
         }
 
         MedicineDTO medicine = new MedicineDTO(
@@ -147,14 +173,14 @@ public class MedicineRepository {
             (String) map.get("name"),
             (String) map.get("form"),
             (String) map.get("frequency"),
-            (Date) map.get("startDate"),
+            startDate,
             doseTimes,
             (String) map.get("intakeTime"),
             (String) map.get("code"),
             (String) map.get("doctorId"),
             (String) map.get("userId")
         );
-        medicine.setCreatedAt((Date) map.get("createdAt"));
+        medicine.setCreatedAt(createdAt);
         return medicine;
     }
 
@@ -163,12 +189,38 @@ public class MedicineRepository {
         if (map.get("doseTimes") != null) {
             List<Map<String, Object>> doseList = (List<Map<String, Object>>) map.get("doseTimes");
             for (Map<String, Object> d : doseList) {
+                Object amountObj = d.get("amount");
+                double amount;
+                if (amountObj instanceof Long) {
+                    amount = ((Long) amountObj).doubleValue();
+                } else if (amountObj instanceof Double) {
+                    amount = (Double) amountObj;
+                } else {
+                    amount = 0.0;
+                }
+                
                 doseTimes.add(new DoseTime(
                     (String) d.get("time"),
-                    (Double) d.get("amount"),
+                    amount,
                     (String) d.get("unit")
                 ));
             }
+        }
+
+        Object startDateObj = map.get("startDate");
+        Date startDate = null;
+        if (startDateObj instanceof com.google.firebase.Timestamp) {
+            startDate = ((com.google.firebase.Timestamp) startDateObj).toDate();
+        } else if (startDateObj instanceof Date) {
+            startDate = (Date) startDateObj;
+        }
+
+        Object createdAtObj = map.get("createdAt");
+        Date createdAt = null;
+        if (createdAtObj instanceof com.google.firebase.Timestamp) {
+            createdAt = ((com.google.firebase.Timestamp) createdAtObj).toDate();
+        } else if (createdAtObj instanceof Date) {
+            createdAt = (Date) createdAtObj;
         }
 
         Medicine medicine = new Medicine(
@@ -176,14 +228,14 @@ public class MedicineRepository {
             (String) map.get("name"),
             map.get("form") != null ? MedicineForm.valueOf((String) map.get("form")) : null,
             (String) map.get("frequency"),
-            (Date) map.get("startDate"),
+            startDate,
             doseTimes,
             map.get("intakeTime") != null ? IntakeTime.valueOf((String) map.get("intakeTime")) : null,
             (String) map.get("code"),
             (String) map.get("doctorId"),
             (String) map.get("userId")
         );
-        medicine.setCreatedAt((Date) map.get("createdAt"));
+        medicine.setCreatedAt(createdAt);
         return medicine;
     }
 
