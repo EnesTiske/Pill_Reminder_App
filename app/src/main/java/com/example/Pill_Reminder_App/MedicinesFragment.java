@@ -77,6 +77,24 @@ public class MedicinesFragment extends Fragment {
                 ((TextView)medItem.findViewById(R.id.tvMedMealInfo)).setText(dto.getIntakeTime());
                 String nextReminder = calculateNextReminder(dto);
                 ((TextView)medItem.findViewById(R.id.tvMedNextReminder)).setText("Sonraki hatırlatma: " + nextReminder);
+                medItem.findViewById(R.id.btnDeleteMedicine).setOnClickListener(v -> {
+                    new android.app.AlertDialog.Builder(getContext())
+                        .setTitle("İlaç Silinsin mi?")
+                        .setMessage(
+                            "İlaç Adı: " + dto.getName() +
+                            "\nKullanım Zamanı: " + (dto.getIntakeTime() != null ? dto.getIntakeTime() : "-") +
+                            "\n\nBu ilacı silmek istediğinize emin misiniz?")
+                        .setPositiveButton("Evet", (dialog, which) -> {
+                            medicineRepository.delete(dto.getId(), unused -> {
+                                Toast.makeText(getContext(), "İlaç silindi", Toast.LENGTH_SHORT).show();
+                                loadMedicines();
+                            }, e -> {
+                                Toast.makeText(getContext(), "Silme başarısız: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                        })
+                        .setNegativeButton("Hayır", null)
+                        .show();
+                });
                 layoutMedicines.addView(medItem);
             }
         }

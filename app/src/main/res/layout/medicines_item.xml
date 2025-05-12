@@ -52,4 +52,14 @@
             android:textSize="14sp"
             android:textColor="#2B4D66" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/btnDeleteMedicine"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:tint="#D32F2F"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="Sil"
+        android:layout_marginStart="12dp"/>
 </LinearLayout> 
