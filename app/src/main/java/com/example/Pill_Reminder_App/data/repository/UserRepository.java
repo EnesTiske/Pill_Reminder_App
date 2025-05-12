@@ -110,6 +110,7 @@ public class UserRepository extends GenericRepository<User, UserDTO> {
     private UserDTO fromMap(String id, Map<String, Object> map) {
         return new UserDTO(
             id,
+            (String) map.get("userId"),
             (String) map.get("name"),
             (String) map.get("email"),
             (String) map.get("hashedPassword"),

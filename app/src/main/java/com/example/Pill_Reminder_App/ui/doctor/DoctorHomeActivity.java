@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Pill_Reminder_App.LoginActivity;
+import com.example.Pill_Reminder_App.MainActivity;
 import com.example.Pill_Reminder_App.R;
 import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.data.dto.UserDTO;
