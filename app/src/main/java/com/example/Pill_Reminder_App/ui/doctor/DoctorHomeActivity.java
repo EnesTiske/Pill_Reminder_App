@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.Pill_Reminder_App.LoginActivity;
+import com.example.Pill_Reminder_App.MainActivity;
 import com.example.Pill_Reminder_App.R;
 import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.data.dto.UserDTO;
@@ -130,12 +131,6 @@ public class DoctorHomeActivity extends AppCompatActivity implements NavigationV
 
         if (id == R.id.nav_home) {
             // Ana sayfa zaten açık
-        } else if (id == R.id.nav_patients) {
-            // Hasta listesi sayfasına git
-            startActivity(new Intent(this, PatientListActivity.class));
-        } else if (id == R.id.nav_medicines) {
-            // İlaç listesi sayfasına git
-            startActivity(new Intent(this, MedicineListActivity.class));
         } else if (id == R.id.nav_statistics) {
             // İstatistik sayfasına git
             startActivity(new Intent(this, DoctorStatisticsActivity.class));
