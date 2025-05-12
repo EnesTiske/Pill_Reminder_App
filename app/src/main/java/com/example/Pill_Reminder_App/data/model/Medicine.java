@@ -14,7 +14,7 @@ public class Medicine {
     private IntakeTime intakeTime;
     private String code;
     private String doctorId; // nullable
-    private String userId; // ilacın bağlı olduğu kullanıcı (hasta) id'si
+    private String email;
     private Date createdAt;
 
     public Medicine() {
@@ -31,7 +31,7 @@ public class Medicine {
         this.intakeTime = intakeTime;
         this.code = code;
         this.doctorId = doctorId;
-        this.userId = userId;
+        this.email = email;
         this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
     }
 
@@ -62,8 +62,8 @@ public class Medicine {
     public String getDoctorId() { return doctorId; }
     public void setDoctorId(String doctorId) { this.doctorId = doctorId; }
 
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public String getUserEmail() { return email; }
+    public void setUserId(String email) { this.email = email; }
 
     public Date getCreatedAt() { return createdAt; }
     public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }

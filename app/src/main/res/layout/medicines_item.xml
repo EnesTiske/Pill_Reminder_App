@@ -1,65 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="#E6F3FB"
-    android:padding="12dp"
-    android:layout_marginVertical="12dp"
-    android:layout_marginHorizontal="12dp"
-    android:gravity="center_vertical"
-    android:elevation="2dp">
-
-    <ImageView
-        android:id="@+id/ivIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/ic_medicines"
-        android:contentDescription="İlaç İkonu" />
-
-    <View
-        android:layout_width="12dp"
-        android:layout_height="0dp" />
+    android:layout_marginHorizontal="8dp"
+    android:layout_marginVertical="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvMedName"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="İlaç Adı"
-            android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#222" />
+            android:textStyle="bold"
+            android:textColor="#2B4D66"
+            android:layout_marginBottom="8dp"/>
 
         <TextView
             android:id="@+id/tvMedMealInfo"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Yemekten önce"
-            android:textSize="15sp"
-            android:textColor="#444" />
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp"/>
 
         <TextView
             android:id="@+id/tvMedNextReminder"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sonraki hatırlatma: 15:00"
             android:textSize="14sp"
-            android:textColor="#2B4D66" />
+            android:textColor="#666666"/>
+
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btnDeleteMedicine"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@android:drawable/ic_menu_delete"
-        android:tint="#D32F2F"
-        android:layout_gravity="center_vertical"
-        android:contentDescription="Sil"
-        android:layout_marginStart="12dp"/>
-</LinearLayout> 
+</androidx.cardview.widget.CardView> 

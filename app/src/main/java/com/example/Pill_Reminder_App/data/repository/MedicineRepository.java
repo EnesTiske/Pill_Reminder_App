@@ -146,6 +146,22 @@ public class MedicineRepository {
             .addOnFailureListener(onFailure);
     }
 
+    public void getByUserEmail(String userEmail, OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .whereEqualTo("userEmail", userEmail)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<MedicineDTO> medicines = new ArrayList<>();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Map<String, Object> data = document.getData();
+                    MedicineDTO medicine = fromMap(document.getId(), data);
+                    medicines.add(medicine);
+                }
+                onSuccess.onSuccess(medicines);
+            })
+            .addOnFailureListener(onFailure);
+    }
+
     private MedicineDTO fromMap(String id, Map<String, Object> map) {
         List<DoseTimeDTO> doseTimes = new ArrayList<>();
         if (map.get("doseTimes") != null) {
@@ -195,7 +211,7 @@ public class MedicineRepository {
             (String) map.get("intakeTime"),
             (String) map.get("code"),
             (String) map.get("doctorId"),
-            (String) map.get("userId")
+            (String) map.get("userEmail")
         );
         medicine.setCreatedAt(createdAt);
         return medicine;
@@ -250,7 +266,7 @@ public class MedicineRepository {
             map.get("intakeTime") != null ? IntakeTime.valueOf((String) map.get("intakeTime")) : null,
             (String) map.get("code"),
             (String) map.get("doctorId"),
-            (String) map.get("userId")
+            (String) map.get("userEmail")
         );
         medicine.setCreatedAt(createdAt);
         return medicine;
@@ -265,7 +281,7 @@ public class MedicineRepository {
         map.put("doseTimes", medicine.getDoseTimes());
         map.put("intakeTime", medicine.getIntakeTime() != null ? medicine.getIntakeTime().name() : null);
         map.put("doctorId", medicine.getDoctorId());
-        map.put("userId", medicine.getUserId());
+        map.put("userEmail", medicine.getUserEmail());
         map.put("code", medicine.getCode());
         map.put("createdAt", medicine.getCreatedAt());
         return map;
