@@ -19,6 +19,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.example.Pill_Reminder_App.data.dto.UserDTO;
 import com.example.Pill_Reminder_App.data.repository.UserRepository;
@@ -86,7 +87,8 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                UserDTO userDTO = new UserDTO(name, email, password, userType);
+                String userId = UUID.randomUUID().toString();
+                UserDTO userDTO = new UserDTO(userId, name, email, password, userType);
                 UserService userService = new UserService(new UserRepository());
                 userService.add(userDTO,
                     unused -> {

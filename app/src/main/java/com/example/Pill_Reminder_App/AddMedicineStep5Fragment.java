@@ -96,4 +96,16 @@ public class AddMedicineStep5Fragment extends Fragment {
             ((AddMedicineActivity) getActivity()).setMedicineTimeDoses(timeDoseList);
         }
     }
+
+    public boolean isStepValid() {
+        if (timeDoseList.isEmpty()) {
+            return false;
+        }
+
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineTimeDoses(timeDoseList);
+        }
+
+        return true;
+    }
 } 

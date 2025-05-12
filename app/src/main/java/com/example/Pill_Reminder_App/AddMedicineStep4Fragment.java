@@ -13,31 +13,51 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AddMedicineStep4Fragment extends Fragment {
+    private Date selectedDate;
+    private DatePicker datePicker;
+    private Button btnNext;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_medicine_step4, container, false);
-
-        DatePicker datePicker = view.findViewById(R.id.datePicker);
-        Button btnNext = view.findViewById(R.id.btnNext);
+        
+        datePicker = view.findViewById(R.id.datePicker);
+        btnNext = view.findViewById(R.id.btnNext);
 
         // Minimum tarihi bugün olarak ayarla
         Calendar calendar = Calendar.getInstance();
         datePicker.setMinDate(calendar.getTimeInMillis());
 
-        btnNext.setOnClickListener(v -> {
-            int year = datePicker.getYear();
-            int month = datePicker.getMonth();
-            int day = datePicker.getDayOfMonth();
-            
+        // Varsayılan olarak bugünün tarihini seç
+        selectedDate = calendar.getTime();
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineStartDate(selectedDate);
+        }
+
+        // Tarih değiştiğinde
+        datePicker.setOnDateChangedListener((view1, year, month, day) -> {
             calendar.set(year, month, day);
-            Date startDate = calendar.getTime();
-            
+            selectedDate = calendar.getTime();
             if (getActivity() instanceof AddMedicineActivity) {
-                ((AddMedicineActivity) getActivity()).setMedicineStartDate(startDate);
+                ((AddMedicineActivity) getActivity()).setMedicineStartDate(selectedDate);
             }
         });
 
         return view;
+    }
+
+    public boolean isStepValid() {
+        // Tarih seçilmiş mi kontrol et
+        if (selectedDate == null) {
+            return false;
+        }
+
+        // Tarihi Activity'ye kaydet
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineStartDate(selectedDate);
+        }
+
+        return true;
     }
 }

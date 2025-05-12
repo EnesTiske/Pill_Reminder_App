@@ -3,72 +3,70 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:padding="16dp">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Kayıt Ol"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="32dp"/>
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
 
     <EditText
         android:id="@+id/nameInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:hint="Ad Soyad"
         android:inputType="textPersonName"
-        android:minHeight="48dp" />
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/emailInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="E-posta"
+        android:hint="Email"
         android:inputType="textEmailAddress"
-        android:minHeight="48dp" />
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/passwordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
         android:hint="Şifre"
         android:inputType="textPassword"
-        android:minHeight="48dp" />
+        android:layout_marginBottom="16dp"/>
 
     <EditText
         android:id="@+id/confirmPasswordInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:hint="Şifre Tekrar"
         android:inputType="textPassword"
-        android:minHeight="48dp" />
+        android:layout_marginBottom="16dp"/>
 
     <RadioGroup
-        android:id="@+id/userTypeRadioGroup"
+        android:id="@+id/userTypeGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
 
         <RadioButton
-            android:id="@+id/radioDoctor"
+            android:id="@+id/doctorRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Doktor" />
+            android:text="Doktor"
+            android:layout_marginEnd="16dp"/>
 
         <RadioButton
-            android:id="@+id/radioPatient"
+            android:id="@+id/patientRadio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hasta" />
+            android:text="Hasta"/>
+
     </RadioGroup>
 
     <Button
@@ -76,13 +74,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Kayıt Ol"/>
-
-    <TextView
-        android:id="@+id/loginLink"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Zaten hesabınız var mı? Giriş yapın"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/black"/>
 
 </LinearLayout> 

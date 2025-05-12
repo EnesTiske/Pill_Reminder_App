@@ -3,24 +3,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <TextView
-        android:id="@+id/tvDoctorWelcome"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvDoctorName"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hoşgeldiniz, Doktor!"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginBottom="32dp"/>
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
 
-    <Button
-        android:id="@+id/btnAddMedicine"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Yeni İlaç Oluştur" />
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp">
 
-    <!-- Buraya doktorlara özel butonlar, liste vs. ekleyebilirsin -->
+        <Button
+            android:id="@+id/btnAddMedicine"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Yeni İlaç Ekle"
+            android:layout_marginEnd="8dp"/>
+
+        <Button
+            android:id="@+id/btnViewStatistics"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="İstatistikler"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Oluşturduğum İlaçlar"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCreatedMedicines"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aktif Hastalarım"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvActivePatients"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
 </LinearLayout> 

@@ -8,6 +8,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 public class UserService implements IService<UserDTO> {
     private final UserRepository userRepository;
@@ -46,7 +49,7 @@ public class UserService implements IService<UserDTO> {
     // DTO -> Entity
     private User fromDTO(UserDTO dto) {
         String hashedPassword = hashPassword(dto.getPassword());
-        return new User(dto.getName(), dto.getEmail(), hashedPassword, dto.getUserType());
+        return new User(dto.getId(), dto.getName(), dto.getEmail(), hashedPassword, dto.getUserType());
     }
 
     private String hashPassword(String password) {
@@ -74,5 +77,42 @@ public class UserService implements IService<UserDTO> {
         map.put("hashedPassword", user.getHashedPassword());
         map.put("userType", user.getUserType());
         return map;
+    }
+
+    public void getUser(String userId, Consumer<UserDTO> onSuccess, Consumer<Exception> onError) {
+        try {
+            userRepository.getById(userId,
+                user -> {
+                    if (user != null) {
+                        onSuccess.accept(user);
+                    } else {
+                        onError.accept(new Exception("Kullanıcı bulunamadı"));
+                    }
+                },
+                e -> onError.accept(new Exception("Kullanıcı bilgileri yüklenemedi: " + e.getMessage()))
+            );
+        } catch (Exception e) {
+            onError.accept(e);
+        }
+    }
+
+    public void getPatients(String doctorId, Consumer<List<UserDTO>> onSuccess, Consumer<Exception> onError) {
+        try {
+            userRepository.getAll(
+                users -> {
+                    if (users != null) {
+                        List<UserDTO> patients = users.stream()
+                            .filter(u -> "patient".equals(u.getUserType()))
+                            .collect(Collectors.toList());
+                        onSuccess.accept(patients);
+                    } else {
+                        onSuccess.accept(new ArrayList<>());
+                    }
+                },
+                e -> onError.accept(new Exception("Hasta listesi yüklenemedi: " + e.getMessage()))
+            );
+        } catch (Exception e) {
+            onError.accept(e);
+        }
     }
 } 

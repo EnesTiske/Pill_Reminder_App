@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class MedicineService implements IService<MedicineDTO> {
     private final MedicineRepository medicineRepository;
@@ -20,6 +25,7 @@ public class MedicineService implements IService<MedicineDTO> {
     public MedicineService(MedicineRepository medicineRepository) {
         this.medicineRepository = medicineRepository;
     }
+
 
     @Override
     public void add(MedicineDTO dto, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
@@ -46,6 +52,25 @@ public class MedicineService implements IService<MedicineDTO> {
     @Override
     public void delete(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         medicineRepository.delete(id, onSuccess, onFailure);
+    }
+
+    public void generateUniqueCode(OnSuccessListener<String> onSuccess, OnFailureListener onFailure) {
+        generateUniqueCodeInternal(onSuccess, onFailure);
+    }
+
+    private void generateUniqueCodeInternal(OnSuccessListener<String> onSuccess, OnFailureListener onFailure) {
+        String code = java.util.UUID.randomUUID().toString().substring(0, 8);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("medicines").whereEqualTo("code", code).get()
+            .addOnSuccessListener((QuerySnapshot snapshot) -> {
+                if (snapshot.isEmpty()) {
+                    onSuccess.onSuccess(code);
+                } else {
+                    // Çakışma varsa tekrar dene
+                    generateUniqueCodeInternal(onSuccess, onFailure);
+                }
+            })
+            .addOnFailureListener(onFailure);
     }
 
     // DTO -> Entity
@@ -94,5 +119,25 @@ public class MedicineService implements IService<MedicineDTO> {
             map.put("doseTimes", doseList);
         }
         return map;
+    }
+
+    public void getMedicines(String doctorId, Consumer<List<MedicineDTO>> onSuccess, Consumer<Exception> onError) {
+        try {
+            medicineRepository.getAll(
+                medicines -> {
+                    if (medicines != null) {
+                        List<MedicineDTO> doctorMedicines = medicines.stream()
+                            .filter(m -> doctorId.equals(m.getDoctorId()))
+                            .collect(Collectors.toList());
+                        onSuccess.accept(doctorMedicines);
+                    } else {
+                        onSuccess.accept(new ArrayList<>());
+                    }
+                },
+                e -> onError.accept(new Exception("İlaç listesi yüklenemedi: " + e.getMessage()))
+            );
+        } catch (Exception e) {
+            onError.accept(e);
+        }
     }
 } 

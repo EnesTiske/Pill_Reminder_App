@@ -160,4 +160,16 @@ public class AddMedicineStep3Fragment extends Fragment {
 
         dialog.show();
     }
+
+    public boolean isStepValid() {
+        if (selectedFrequency == null || selectedFrequency.isEmpty()) {
+            return false;
+        }
+
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineFrequency(selectedFrequency);
+        }
+
+        return true;
+    }
 } 

@@ -12,16 +12,18 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.domain.service.MedicineService;
 import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.example.Pill_Reminder_App.data.dto.DoseTimeDTO;
+import com.example.Pill_Reminder_App.utils.UserSessionManager;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AddMedicineActivity extends AppCompatActivity {
     private int currentStep = 1;
@@ -30,17 +32,33 @@ public class AddMedicineActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private MedicineService medicineService;
     private MedicineDTO medicineDTO;
+    private String medicineCode;
+    private UserSessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_medicine);
 
+        // Session manager'ı başlat
+        sessionManager = new UserSessionManager(this);
+
+        // Eğer kullanıcı giriş yapmamışsa login ekranına yönlendir
+        if (!sessionManager.isLoggedIn()) {
+            Toast.makeText(this, "Lütfen önce giriş yapın", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
         // Service ve DTO'yu başlat
         MedicineRepository repository = new MedicineRepository();
         medicineService = new MedicineService(repository);
         medicineDTO = new MedicineDTO();
         medicineDTO.setDoseTimes(new ArrayList<>());
+
+        // Doktor ID'sini DTO'ya ekle
+        medicineDTO.setDoctorId(sessionManager.getUserId());
 
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
@@ -53,50 +71,77 @@ public class AddMedicineActivity extends AppCompatActivity {
     }
 
     private void showStep(int step) {
-        Fragment fragment;
-        String titleText = "";
+        AtomicReference<Fragment> fragment = new AtomicReference<>();
+        final String[] titleText = {""};
         switch (step) {
             case 1:
-                fragment = new AddMedicineStep1Fragment();
-                titleText = "Hangi ilacı eklemek istiyorsunuz?";
+                fragment.set(new AddMedicineStep1Fragment());
+                titleText[0] = "Hangi ilacı eklemek istiyorsunuz?";
                 break;
             case 2:
-                fragment = new AddMedicineStep2Fragment();
-                titleText = "İlacın şekli nedir?";
+                fragment.set(new AddMedicineStep2Fragment());
+                titleText[0] = "İlacın şekli nedir?";
                 break;
             case 3:
-                fragment = new AddMedicineStep3Fragment();
-                titleText = "Hangi sıklıkta kullanılır?";
+                fragment.set(new AddMedicineStep3Fragment());
+                titleText[0] = "Hangi sıklıkta kullanılır?";
                 break;
             case 4:
-                fragment = new AddMedicineStep4Fragment();
-                titleText = "Başlangıç tarihi seçin";
+                fragment.set(new AddMedicineStep4Fragment());
+                titleText[0] = "Başlangıç tarihi seçin";
                 break;
             case 5:
-                fragment = new AddMedicineStep5Fragment();
-                titleText = "Doz ve saat bilgilerini kontrol edin";
+                fragment.set(new AddMedicineStep5Fragment());
+                titleText[0] = "Doz ve saat bilgilerini kontrol edin";
                 break;
             case 6:
-                fragment = new AddMedicineStep6Fragment();
-                titleText = "İlacınızı ne zaman alacaksınız?";
+                fragment.set(new AddMedicineStep6Fragment());
+                titleText[0] = "İlacınızı ne zaman alacaksınız?";
                 break;
             case 7:
-                fragment = new AddMedicineStep7Fragment();
-                titleText = "İlaç başarıyla eklendi!";
-                saveMedicine();
-                break;
-            default:
+                // İlaç kodunu oluştur
+                medicineCode = generateMedicineCode();
+                medicineDTO.setCode(medicineCode);
+                
+                // İlaç detaylarını güncelle
+                medicineDTO.setName(medicineDTO.getName());
+                medicineDTO.setForm(medicineDTO.getForm());
+                medicineDTO.setFrequency(medicineDTO.getFrequency());
+                medicineDTO.setStartDate(medicineDTO.getStartDate());
+                medicineDTO.setDoseTimes(medicineDTO.getDoseTimes());
+                medicineDTO.setIntakeTime(medicineDTO.getIntakeTime());
+                
+                // Veritabanına kaydet
+                medicineService.add(
+                    medicineDTO,
+                    unused -> {
+                        // Başarılı kayıt sonrası fragment'i göster
+                        fragment.set(new AddMedicineStep7Fragment());
+                        titleText[0] = "İlaç başarıyla eklendi!";
+                        
+                        if (fragment.get() != null) {
+                            FragmentManager fragmentManager = getSupportFragmentManager();
+                            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                            transaction.replace(R.id.fragmentContainer, fragment.get());
+                            transaction.commit();
+                        }
+                    },
+                    e -> Toast.makeText(this, "Hata oluştu: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
                 return;
         }
 
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragmentContainer, fragment);
-        transaction.commit();
+        if (fragment.get() != null) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.replace(R.id.fragmentContainer, fragment.get());
+            transaction.commit();
+        }
 
         // Başlık metnini güncelle
         TextView stepTitle = findViewById(R.id.stepTitle);
         if (stepTitle != null) {
-            stepTitle.setText(titleText);
+            stepTitle.setText(titleText[0]);
         }
 
         // Adım dairelerini güncelle
@@ -120,46 +165,66 @@ public class AddMedicineActivity extends AppCompatActivity {
         btnNext.setText(currentStep == stepAmount ? "Tamamla" : "İleri");
     }
 
-    public void nextStep() {
-        if (currentStep < stepAmount) {
-            currentStep++;
-            showStep(currentStep);
-        } else {
-            finish();
+    private void nextStep() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+        if (currentFragment instanceof AddMedicineStep1Fragment) {
+            if (((AddMedicineStep1Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep2Fragment) {
+            if (((AddMedicineStep2Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep3Fragment) {
+            if (((AddMedicineStep3Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep4Fragment) {
+            if (((AddMedicineStep4Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep5Fragment) {
+            if (((AddMedicineStep5Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep6Fragment) {
+            if (((AddMedicineStep6Fragment) currentFragment).isStepValid()) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        } else if (currentFragment instanceof AddMedicineStep7Fragment) {
+            if (((AddMedicineStep7Fragment) currentFragment).isStepValid()) {
+                saveMedicine();
+            }
         }
     }
 
-    public void previousStep() {
+    private void previousStep() {
         if (currentStep > 1) {
             currentStep--;
             showStep(currentStep);
         }
     }
 
-    private void saveMedicine() {
-        // Giriş yapan doktorun id'sini/emailini al (örnek: email, gerçek projede Auth ile alınmalı)
-        String doctorId = "doctor@example.com"; // TODO: Giriş yapan doktorun id/emailini dinamik al
-        String userId = null; // TODO: Eğer hasta seçiliyorsa, onun id'si atanmalı
-        String uniqueCode = UUID.randomUUID().toString().substring(0, 8); // 8 karakterlik benzersiz kod
-        medicineDTO.setDoctorId(doctorId);
-        medicineDTO.setUserId(userId);
-        medicineDTO.setCode(uniqueCode);
-        medicineService.add(
-                medicineDTO,
-                unused -> {
-                    // ✅ Başarılı işlem: kodu yeni ekrana ilet
-                    Intent intent = new Intent(this, com.example.Pill_Reminder_App.ui.doctor.MedicineCreatedActivity.class);
-                    intent.putExtra("medicineCode", uniqueCode);
-                    startActivity(intent);
-                    finish();
-                },
-                e -> {
-                    // ❌ Hatalı işlem
-                    Toast.makeText(this, "Hata oluştu: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-        );
+    private String generateMedicineCode() {
+        // Benzersiz bir kod oluştur (örnek: MED-XXXX-YYYY)
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String random = String.format("%04d", (int) (Math.random() * 10000));
+        return "MED-" + timestamp.substring(timestamp.length() - 4) + "-" + random;
     }
 
+    public String getMedicineCode() {
+        return medicineCode;
+    }
+
+    private void saveMedicine() {
+        // Bu metot artık kullanılmıyor, tüm işlemler showStep(7) içinde yapılıyor
+    }
 
     // Fragment'lerden veri almak için metodlar
     public void setMedicineName(String name) {
@@ -184,5 +249,9 @@ public class AddMedicineActivity extends AppCompatActivity {
 
     public void setMedicineMealTime(String mealTime) {
         medicineDTO.setIntakeTime(mealTime);
+    }
+
+    public MedicineDTO getMedicineDTO() {
+        return medicineDTO;
     }
 } 

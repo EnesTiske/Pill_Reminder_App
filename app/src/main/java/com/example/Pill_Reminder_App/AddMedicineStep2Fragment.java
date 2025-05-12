@@ -35,4 +35,18 @@ public class AddMedicineStep2Fragment extends Fragment {
         });
         return view;
     }
+
+    public boolean isStepValid() {
+        Spinner spinner = getView().findViewById(R.id.spinnerForm);
+        if (spinner == null || spinner.getSelectedItem() == null) {
+            return false;
+        }
+
+        String selectedForm = spinner.getSelectedItem().toString();
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineForm(selectedForm);
+        }
+
+        return true;
+    }
 } 

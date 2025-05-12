@@ -39,4 +39,18 @@ public class AddMedicineStep1Fragment extends Fragment {
     public String getMedicineName() {
         return medicineNameEditText.getText() != null ? medicineNameEditText.getText().toString() : "";
     }
+
+    public boolean isStepValid() {
+        String medicineName = medicineNameEditText.getText().toString().trim();
+        if (medicineName.isEmpty()) {
+            return false;
+        }
+
+        // Verileri Activity'ye kaydet
+        if (getActivity() instanceof AddMedicineActivity) {
+            ((AddMedicineActivity) getActivity()).setMedicineName(medicineName);
+        }
+
+        return true;
+    }
 } 
