@@ -2,9 +2,12 @@ package com.example.Pill_Reminder_App;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
@@ -37,6 +40,16 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
 
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_code_input) {
+                showCodeInputDialog();
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            }
+            return false;
+        });
+
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(this);
         
@@ -44,6 +57,23 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         if (savedInstanceState == null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
+    }
+
+    private void showCodeInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Kod Gir");
+
+        final EditText input = new EditText(this);
+        builder.setView(input);
+
+        builder.setPositiveButton("Tamam", (dialog, which) -> {
+            String code = input.getText().toString();
+            System.out.println("Girilen kod: " + code);
+            Toast.makeText(MainActivity.this, "İlaç ekleme başarılı", Toast.LENGTH_SHORT).show();
+        });
+        builder.setNegativeButton("İptal", (dialog, which) -> dialog.cancel());
+
+        builder.show();
     }
 
     @Override

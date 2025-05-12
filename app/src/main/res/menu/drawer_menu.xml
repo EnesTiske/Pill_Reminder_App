@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_code_input" android:icon="@drawable/ic_code" android:title="Kod Gir" />
     <item android:id="@+id/nav_calendar" android:icon="@drawable/ic_calendar" android:title="Takvim" />
     <item android:id="@+id/nav_rewards" android:icon="@drawable/ic_rewards" android:title="Ödüller" />
     <item android:id="@+id/nav_address" android:icon="@drawable/ic_address" android:title="Adresler" />
