@@ -14,6 +14,8 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
+import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
@@ -24,11 +26,14 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     private NavigationView navigationView;
     private Toolbar toolbar;
     private ActionBarDrawerToggle drawerToggle;
+    private MedicineRepository medicineRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        medicineRepository = new MedicineRepository();
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -68,8 +73,19 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
 
         builder.setPositiveButton("Tamam", (dialog, which) -> {
             String code = input.getText().toString();
-            System.out.println("Girilen kod: " + code);
-            Toast.makeText(MainActivity.this, "İlaç ekleme başarılı", Toast.LENGTH_SHORT).show();
+            if (!code.isEmpty()) {
+                medicineRepository.getByCode(code,
+                    medicine -> {
+                        String message = "İlaç bulundu: " + medicine.getName();
+                        Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                    },
+                    error -> {
+                        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                );
+            } else {
+                Toast.makeText(MainActivity.this, "Lütfen bir kod girin", Toast.LENGTH_SHORT).show();
+            }
         });
         builder.setNegativeButton("İptal", (dialog, which) -> dialog.cancel());
 

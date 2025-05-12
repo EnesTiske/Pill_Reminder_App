@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Date;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class MedicineRepository {
     private final FirebaseFirestore db;
@@ -127,6 +128,22 @@ public class MedicineRepository {
         } catch (ExecutionException | InterruptedException e) {
             throw new Exception("İlaç listesi yüklenemedi: " + e.getMessage());
         }
+    }
+
+    public void getByCode(String code, OnSuccessListener<MedicineDTO> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .whereEqualTo("code", code)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                if (!queryDocumentSnapshots.isEmpty()) {
+                    DocumentSnapshot document = queryDocumentSnapshots.getDocuments().get(0);
+                    MedicineDTO medicine = fromMap(document.getId(), document.getData());
+                    onSuccess.onSuccess(medicine);
+                } else {
+                    onFailure.onFailure(new Exception("Bu kod ile eşleşen ilaç bulunamadı"));
+                }
+            })
+            .addOnFailureListener(onFailure);
     }
 
     private MedicineDTO fromMap(String id, Map<String, Object> map) {
