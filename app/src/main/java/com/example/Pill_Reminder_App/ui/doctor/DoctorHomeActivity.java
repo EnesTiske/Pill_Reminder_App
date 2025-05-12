@@ -1,15 +1,23 @@
 package com.example.Pill_Reminder_App.ui.doctor;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.Pill_Reminder_App.LoginActivity;
 import com.example.Pill_Reminder_App.R;
 import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.data.dto.UserDTO;
@@ -18,11 +26,12 @@ import com.example.Pill_Reminder_App.data.repository.UserRepository;
 import com.example.Pill_Reminder_App.domain.service.MedicineService;
 import com.example.Pill_Reminder_App.domain.service.UserService;
 import com.example.Pill_Reminder_App.utils.UserSessionManager;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DoctorHomeActivity extends AppCompatActivity {
+public class DoctorHomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private UserSessionManager sessionManager;
     private MedicineService medicineService;
     private UserService userService;
@@ -35,6 +44,10 @@ public class DoctorHomeActivity extends AppCompatActivity {
     private ActivePatientsAdapter patientsAdapter;
     private List<MedicineDTO> createdMedicines;
     private List<UserDTO> activePatients;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private Toolbar toolbar;
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +61,14 @@ public class DoctorHomeActivity extends AppCompatActivity {
             // Session kontrolü
             if (!sessionManager.isLoggedIn()) {
                 Toast.makeText(this, "Lütfen giriş yapın", Toast.LENGTH_SHORT).show();
-                startActivity(new android.content.Intent(this, com.example.Pill_Reminder_App.ui.auth.LoginActivity.class));
+                startActivity(new Intent(this, LoginActivity.class));
                 finish();
                 return;
             }
 
             if (!sessionManager.isDoctor()) {
                 Toast.makeText(this, "Bu sayfaya sadece doktorlar erişebilir", Toast.LENGTH_SHORT).show();
-                startActivity(new android.content.Intent(this, com.example.Pill_Reminder_App.ui.patient.PatientHomeActivity.class));
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
                 return;
             }
@@ -64,7 +77,7 @@ public class DoctorHomeActivity extends AppCompatActivity {
             if (doctorId == null || doctorId.isEmpty()) {
                 Toast.makeText(this, "Doktor bilgisi bulunamadı, lütfen tekrar giriş yapın", Toast.LENGTH_SHORT).show();
                 sessionManager.logout();
-                startActivity(new android.content.Intent(this, com.example.Pill_Reminder_App.ui.auth.LoginActivity.class));
+                startActivity(new Intent(this, LoginActivity.class));
                 finish();
                 return;
             }
@@ -80,17 +93,58 @@ public class DoctorHomeActivity extends AppCompatActivity {
             loadDoctorData();
             loadCreatedMedicines();
             loadActivePatients();
+
+            // Toolbar ve Navigation Drawer'ı ayarla
+            setupNavigationDrawer();
         } catch (Exception e) {
             Toast.makeText(this, "Bir hata oluştu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            // Hata durumunda login sayfasına yönlendir
-            try {
-                startActivity(new android.content.Intent(this, com.example.Pill_Reminder_App.ui.auth.LoginActivity.class));
-            } catch (Exception ex) {
-                // Eğer login sayfasına yönlendirme de başarısız olursa
-                Toast.makeText(this, "Uygulama başlatılamadı, lütfen tekrar deneyin", Toast.LENGTH_SHORT).show();
-            }
+            startActivity(new Intent(this, LoginActivity.class));
             finish();
         }
+    }
+
+    private void setupNavigationDrawer() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+
+        drawerToggle = new ActionBarDrawerToggle(
+            this,
+            drawerLayout,
+            toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        );
+
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
+
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_home) {
+            // Ana sayfa zaten açık
+        } else if (id == R.id.nav_patients) {
+            // Hasta listesi sayfasına git
+            startActivity(new Intent(this, PatientListActivity.class));
+        } else if (id == R.id.nav_medicines) {
+            // İlaç listesi sayfasına git
+            startActivity(new Intent(this, MedicineListActivity.class));
+        } else if (id == R.id.nav_statistics) {
+            // İstatistik sayfasına git
+            startActivity(new Intent(this, DoctorStatisticsActivity.class));
+        } else if (id == R.id.nav_logout) {
+            logout();
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private void initializeViews() {
@@ -117,7 +171,7 @@ public class DoctorHomeActivity extends AppCompatActivity {
             // Buton click listener'ları
             btnAddMedicine.setOnClickListener(v -> {
                 try {
-                    startActivity(new android.content.Intent(this, com.example.Pill_Reminder_App.AddMedicineActivity.class));
+                    startActivity(new Intent(this, com.example.Pill_Reminder_App.AddMedicineActivity.class));
                 } catch (Exception e) {
                     Toast.makeText(this, "İlaç ekleme sayfası açılamadı: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -125,7 +179,7 @@ public class DoctorHomeActivity extends AppCompatActivity {
 
             btnViewStatistics.setOnClickListener(v -> {
                 try {
-                    startActivity(new android.content.Intent(this, DoctorStatisticsActivity.class));
+                    startActivity(new Intent(this, DoctorStatisticsActivity.class));
                 } catch (Exception e) {
                     Toast.makeText(this, "İstatistik sayfası açılamadı: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -258,5 +312,13 @@ public class DoctorHomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Veriler yenilenemedi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void logout() {
+        sessionManager.logout();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 } 

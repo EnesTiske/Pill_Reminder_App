@@ -17,6 +17,7 @@ import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.domain.service.MedicineService;
 import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.example.Pill_Reminder_App.data.dto.DoseTimeDTO;
+import com.example.Pill_Reminder_App.utils.UserSessionManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,7 @@ public class AddMedicineActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private MedicineService medicineService;
     private MedicineDTO medicineDTO;
+    private LinearLayout stepIndicators;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,30 @@ public class AddMedicineActivity extends AppCompatActivity {
 
         btnNext = findViewById(R.id.btnNext);
         btnBack = findViewById(R.id.btnBack);
+        stepIndicators = findViewById(R.id.stepIndicators);
 
         btnNext.setOnClickListener(v -> nextStep());
         btnBack.setOnClickListener(v -> previousStep());
 
+        // Adım göstergelerini tıklanabilir yap
+        setupStepIndicators();
+
         // İlk adımı göster
         showStep(currentStep);
+    }
+
+    private void setupStepIndicators() {
+        for (int i = 0; i < stepIndicators.getChildCount(); i++) {
+            final int step = i + 1;
+            View dot = stepIndicators.getChildAt(i);
+            dot.setOnClickListener(v -> {
+                if (step < currentStep) {
+                    // Sadece gerideki adımlara dönülebilir
+                    currentStep = step;
+                    showStep(currentStep);
+                }
+            });
+        }
     }
 
     private void showStep(int step) {
@@ -100,20 +120,23 @@ public class AddMedicineActivity extends AppCompatActivity {
         }
 
         // Adım dairelerini güncelle
-        LinearLayout stepIndicators = findViewById(R.id.stepIndicators);
-        if (stepIndicators != null) {
-            for (int i = 0; i < stepIndicators.getChildCount(); i++) {
-                View dot = stepIndicators.getChildAt(i);
-                if (i < step) {
-                    dot.setBackgroundResource(R.drawable.circle_filled);
-                } else {
-                    dot.setBackgroundResource(R.drawable.circle_empty);
-                }
-            }
-        }
+        updateStepIndicators();
 
         // Butonların görünürlüğünü güncelle
         updateButtonVisibility();
+    }
+
+    private void updateStepIndicators() {
+        for (int i = 0; i < stepIndicators.getChildCount(); i++) {
+            View dot = stepIndicators.getChildAt(i);
+            if (i < currentStep) {
+                dot.setBackgroundResource(R.drawable.circle_filled);
+                dot.setEnabled(true); // Gerideki adımlar tıklanabilir
+            } else {
+                dot.setBackgroundResource(R.drawable.circle_empty);
+                dot.setEnabled(false); // İleri adımlar tıklanamaz
+            }
+        }
     }
 
     private void updateButtonVisibility() {
@@ -133,6 +156,17 @@ public class AddMedicineActivity extends AppCompatActivity {
         if (currentStep > 1) {
             currentStep--;
             showStep(currentStep);
+        } else {
+            // İlk adımdaysa ve geri butonuna basıldıysa ana sayfaya dön
+            UserSessionManager sessionManager = new UserSessionManager(this);
+            Intent intent;
+            if (sessionManager.isDoctor()) {
+                intent = new Intent(this, com.example.Pill_Reminder_App.ui.doctor.DoctorHomeActivity.class);
+            } else {
+                intent = new Intent(this, MainActivity.class);
+            }
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -159,7 +193,6 @@ public class AddMedicineActivity extends AppCompatActivity {
                 }
         );
     }
-
 
     // Fragment'lerden veri almak için metodlar
     public void setMedicineName(String name) {
