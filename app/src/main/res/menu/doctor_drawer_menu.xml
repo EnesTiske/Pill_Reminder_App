@@ -7,7 +7,7 @@
             android:title="Ana Sayfa" />
         <item
             android:id="@+id/nav_patients"
-            android:icon="@drawable/ic_patients"
+            android:icon="@drawable/circle_bg"
             android:title="Hastalarım" />
         <item
             android:id="@+id/nav_medicines"
@@ -23,7 +23,7 @@
         <menu>
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_logout"
+                android:icon="@drawable/ic_alarm"
                 android:title="Çıkış Yap" />
         </menu>
     </item>
