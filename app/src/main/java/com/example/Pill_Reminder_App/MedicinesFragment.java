@@ -17,6 +17,7 @@ import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
 import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.Pill_Reminder_App.utils.UserSessionManager;
 
 public class MedicinesFragment extends Fragment {
     private MedicineRepository medicineRepository;
@@ -64,22 +65,20 @@ public class MedicinesFragment extends Fragment {
 
     private void displayMedicines(List<MedicineDTO> medicines) {
         layoutMedicines.removeAllViews();
-        
+        UserSessionManager sessionManager = new UserSessionManager(getContext());
+        String currentUserId = sessionManager.getUserId();
         for (MedicineDTO dto : medicines) {
-            View medItem = LayoutInflater.from(getContext()).inflate(R.layout.medicines_item, layoutMedicines, false);
-            
-            ((TextView)medItem.findViewById(R.id.tvMedName)).setText(dto.getName());
-            ((TextView)medItem.findViewById(R.id.tvMedMealInfo)).setText(dto.getIntakeTime());
-            
-            // Sonraki hatırlatma zamanını hesapla
-            String nextReminder = calculateNextReminder(dto);
-            ((TextView)medItem.findViewById(R.id.tvMedNextReminder)).setText("Sonraki hatırlatma: " + nextReminder);
-
             //
             //TODO sonraki hatırlatma yanlış şuan hesaplama kısmından çekeceksin veriyi
             //
-            
-            layoutMedicines.addView(medItem);
+            if (dto.getUserId() != null && dto.getUserId().equals(currentUserId)) {
+                View medItem = LayoutInflater.from(getContext()).inflate(R.layout.medicines_item, layoutMedicines, false);
+                ((TextView)medItem.findViewById(R.id.tvMedName)).setText(dto.getName());
+                ((TextView)medItem.findViewById(R.id.tvMedMealInfo)).setText(dto.getIntakeTime());
+                String nextReminder = calculateNextReminder(dto);
+                ((TextView)medItem.findViewById(R.id.tvMedNextReminder)).setText("Sonraki hatırlatma: " + nextReminder);
+                layoutMedicines.addView(medItem);
+            }
         }
     }
 
