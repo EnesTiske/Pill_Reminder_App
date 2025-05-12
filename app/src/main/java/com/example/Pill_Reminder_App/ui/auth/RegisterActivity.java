@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText nameInput;
@@ -117,8 +118,12 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
+                // UUID oluştur
+                String userId = UUID.randomUUID().toString();
+
                 // Yeni kullanıcı oluştur
                 Map<String, Object> user = new HashMap<>();
+                user.put("id", userId);
                 user.put("name", name);
                 user.put("email", email);
                 user.put("hashedPassword", hashedPassword);
@@ -126,10 +131,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                 // Firestore'a kaydet
                 db.collection("users")
-                    .add(user)
-                    .addOnSuccessListener(documentReference -> {
-                        String userId = documentReference.getId();
-                        
+                    .document(userId)
+                    .set(user)
+                    .addOnSuccessListener(aVoid -> {
                         // Oturum bilgilerini kaydet
                         sessionManager.createLoginSession(userId, userType, email, name);
 
@@ -145,7 +149,7 @@ public class RegisterActivity extends AppCompatActivity {
                             db.collection("users").document(userId)
                                 .collection("settings").document("preferences")
                                 .set(userSettings)
-                                .addOnSuccessListener(aVoid -> {
+                                .addOnSuccessListener(aVoid2 -> {
                                     startActivity(new Intent(RegisterActivity.this, com.example.Pill_Reminder_App.ui.patient.PatientHomeActivity.class));
                                     finish();
                                 })

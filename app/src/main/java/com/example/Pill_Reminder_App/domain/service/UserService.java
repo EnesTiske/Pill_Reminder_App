@@ -22,7 +22,7 @@ public class UserService implements IService<UserDTO> {
     @Override
     public void add(UserDTO dto, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         User user = fromDTO(dto);
-        userRepository.add(user.getEmail(), toMap(user), onSuccess, onFailure);
+        userRepository.add(user.getId(), toMap(user), onSuccess, onFailure);
     }
 
     @Override

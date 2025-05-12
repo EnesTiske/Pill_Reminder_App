@@ -32,6 +32,7 @@ public class AddMedicineActivity extends AppCompatActivity {
     private MedicineService medicineService;
     private MedicineDTO medicineDTO;
     private LinearLayout stepIndicators;
+   // UserSessionManager sessionManager = new UserSessionManager(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,9 +172,12 @@ public class AddMedicineActivity extends AppCompatActivity {
     }
 
     private void saveMedicine() {
-        // Giriş yapan doktorun id'sini/emailini al (örnek: email, gerçek projede Auth ile alınmalı)
-        String doctorId = "doctor@example.com"; // TODO: Giriş yapan doktorun id/emailini dinamik al
-        String userId = null; // TODO: Eğer hasta seçiliyorsa, onun id'si atanmalı
+        UserSessionManager sessionManager = new UserSessionManager(this);
+
+        sessionManager.getUserId();
+
+        String doctorId = sessionManager.getUserEmail();
+        String userId = sessionManager.getUserId();
         String uniqueCode = UUID.randomUUID().toString().substring(0, 8); // 8 karakterlik benzersiz kod
         medicineDTO.setDoctorId(doctorId);
         medicineDTO.setUserId(userId);

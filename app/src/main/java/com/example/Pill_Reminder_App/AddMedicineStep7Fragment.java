@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -31,29 +32,31 @@ public class AddMedicineStep7Fragment extends Fragment {
         tvMedicineDetails = view.findViewById(R.id.tv_medicine_details);
         btnGoHome = view.findViewById(R.id.btnGoHome);
 
+        // Kullanıcı tipi kontrolü
+        if (!sessionManager.isDoctor()) {
+            Toast.makeText(requireContext(), "Bu sayfaya sadece doktorlar erişebilir", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getActivity(), com.example.Pill_Reminder_App.ui.patient.PatientHomeActivity.class));
+            getActivity().finish();
+            return view;
+        }
+
         // İlaç kodunu göster
         if (getActivity() instanceof AddMedicineActivity) {
             String medicineCode = ((AddMedicineActivity) getActivity()).getMedicineCode();
             if (medicineCode != null) {
                 tvMedicineCode.setText("İlaç Kodu: " + medicineCode);
             }
-        }
 
-        // İlaç detaylarını göster
-        if (getActivity() instanceof AddMedicineActivity) {
+            // İlaç detaylarını göster
             String details = buildMedicineDetails();
             tvMedicineDetails.setText(details);
         }
 
         // Ana sayfaya dön butonu
         btnGoHome.setOnClickListener(v -> {
-            if (sessionManager.isDoctor()) {
-                // Doktor ise DoctorHomeActivity'ye dön
-                startActivity(new Intent(getActivity(), com.example.Pill_Reminder_App.ui.doctor.DoctorHomeActivity.class));
-            } else {
-                // Hasta ise MainActivity'ye dön
-                startActivity(new Intent(getActivity(), MainActivity.class));
-            }
+            Intent intent = new Intent(getActivity(), com.example.Pill_Reminder_App.ui.doctor.DoctorHomeActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
             getActivity().finish();
         });
 
