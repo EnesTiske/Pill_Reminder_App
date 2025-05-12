@@ -18,15 +18,18 @@ import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.example.Pill_Reminder_App.utils.UserSessionManager;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class MedicinesFragment extends Fragment {
     private MedicineRepository medicineRepository;
     private LinearLayout layoutMedicines;
+    private UserSessionManager sessionManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         medicineRepository = new MedicineRepository();
+        sessionManager = new UserSessionManager(requireContext());
     }
 
     @Nullable
@@ -38,14 +41,31 @@ public class MedicinesFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadMedicines(); // Fragment her görünür olduğunda ilaçları yeniden yükle
+    }
+
     private void loadMedicines() {
-        medicineRepository.getAll(
+        String userEmail = sessionManager.getUserEmail();
+        if (userEmail == null || userEmail.isEmpty()) {
+            Toast.makeText(requireContext(), "Kullanıcı bilgisi bulunamadı", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Kullanıcının ilaçlarını getir
+        medicineRepository.getByUserEmail(userEmail,
             new OnSuccessListener<List<MedicineDTO>>() {
                 @Override
                 public void onSuccess(List<MedicineDTO> medicines) {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
-                            displayMedicines(medicines);
+                            if (medicines != null) {
+                                displayMedicines(medicines);
+                            } else {
+                                showEmptyList();
+                            }
                         });
                     }
                 }
@@ -56,6 +76,7 @@ public class MedicinesFragment extends Fragment {
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             Toast.makeText(getContext(), "İlaçlar yüklenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                            showEmptyList();
                         });
                     }
                 }
@@ -63,48 +84,49 @@ public class MedicinesFragment extends Fragment {
         );
     }
 
+    private void showEmptyList() {
+        layoutMedicines.removeAllViews();
+        TextView noMedicinesText = new TextView(requireContext());
+        noMedicinesText.setText("Henüz ilaç eklenmemiş");
+        noMedicinesText.setTextSize(16);
+        noMedicinesText.setPadding(32, 32, 32, 32);
+        layoutMedicines.addView(noMedicinesText);
+    }
+
     private void displayMedicines(List<MedicineDTO> medicines) {
         layoutMedicines.removeAllViews();
-        UserSessionManager sessionManager = new UserSessionManager(getContext());
-        String currentUserId = sessionManager.getUserId();
-        for (MedicineDTO dto : medicines) {
-            //
-            //TODO sonraki hatırlatma yanlış şuan hesaplama kısmından çekeceksin veriyi
-            //
-            if (dto.getUserId() != null && dto.getUserId().equals(currentUserId)) {
+        
+        if (medicines.isEmpty()) {
+            showEmptyList();
+            return;
+        }
+
+        for (MedicineDTO medicine : medicines) {
+            if (medicine != null && medicine.getName() != null) {
                 View medItem = LayoutInflater.from(getContext()).inflate(R.layout.medicines_item, layoutMedicines, false);
-                ((TextView)medItem.findViewById(R.id.tvMedName)).setText(dto.getName());
-                ((TextView)medItem.findViewById(R.id.tvMedMealInfo)).setText(dto.getIntakeTime());
-                String nextReminder = calculateNextReminder(dto);
-                ((TextView)medItem.findViewById(R.id.tvMedNextReminder)).setText("Sonraki hatırlatma: " + nextReminder);
-                medItem.findViewById(R.id.btnDeleteMedicine).setOnClickListener(v -> {
-                    new android.app.AlertDialog.Builder(getContext())
-                        .setTitle("İlaç Silinsin mi?")
-                        .setMessage(
-                            "İlaç Adı: " + dto.getName() +
-                            "\nKullanım Zamanı: " + (dto.getIntakeTime() != null ? dto.getIntakeTime() : "-") +
-                            "\n\nBu ilacı silmek istediğinize emin misiniz?")
-                        .setPositiveButton("Evet", (dialog, which) -> {
-                            medicineRepository.delete(dto.getId(), unused -> {
-                                Toast.makeText(getContext(), "İlaç silindi", Toast.LENGTH_SHORT).show();
-                                loadMedicines();
-                            }, e -> {
-                                Toast.makeText(getContext(), "Silme başarısız: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-                        })
-                        .setNegativeButton("Hayır", null)
-                        .show();
-                });
+                
+                TextView tvMedName = medItem.findViewById(R.id.tvMedName);
+                TextView tvMedMealInfo = medItem.findViewById(R.id.tvMedMealInfo);
+                TextView tvMedNextReminder = medItem.findViewById(R.id.tvMedNextReminder);
+                
+                tvMedName.setText(medicine.getName());
+                
+                // Alım zamanı bilgisini göster
+                String intakeTime = medicine.getIntakeTime() != null ? medicine.getIntakeTime() : "Belirtilmemiş";
+                tvMedMealInfo.setText("Alım Zamanı: " + intakeTime);
+                
+                // Sonraki hatırlatma zamanını göster
+                String nextReminder = calculateNextReminder(medicine);
+                tvMedNextReminder.setText("Sonraki Hatırlatma: " + nextReminder);
+                
                 layoutMedicines.addView(medItem);
             }
         }
     }
 
-    private String calculateNextReminder(MedicineDTO dto) {
-        // Burada sonraki hatırlatma zamanını hesaplama mantığı eklenebilir
-        // Şimdilik ilk doz zamanını döndürüyoruz
-        if (dto.getDoseTimes() != null && !dto.getDoseTimes().isEmpty()) {
-            return dto.getDoseTimes().get(0).getTime();
+    private String calculateNextReminder(MedicineDTO medicine) {
+        if (medicine.getDoseTimes() != null && !medicine.getDoseTimes().isEmpty()) {
+            return medicine.getDoseTimes().get(0).getTime();
         }
         return "Belirlenmedi";
     }

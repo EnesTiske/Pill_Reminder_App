@@ -140,7 +140,7 @@ public class MedicineService implements IService<MedicineDTO> {
             medicine.getIntakeTime() != null ? medicine.getIntakeTime().name() : null,
             medicine.getCode(),
             medicine.getDoctorId(),
-            medicine.getUserId()
+            medicine.getUserEmail()
         );
         dto.setCreatedAt(medicine.getCreatedAt());
         return dto;
