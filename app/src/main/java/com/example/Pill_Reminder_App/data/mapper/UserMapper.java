@@ -9,7 +9,6 @@ public class UserMapper implements Mapper<UserDTO, User> {
     public UserDTO toDTO(User entity) {
         return new UserDTO(
             entity.getId(),
-            entity.getUserId(),
             entity.getName(),
             entity.getEmail(),
             entity.getHashedPassword(),
@@ -21,7 +20,6 @@ public class UserMapper implements Mapper<UserDTO, User> {
     public User toEntity(UserDTO dto) {
         User user = new User();
         user.setId(dto.getId());
-        user.setUserId(dto.getUserId());
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setHashedPassword(dto.getPassword());

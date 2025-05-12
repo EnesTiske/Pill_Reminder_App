@@ -2,7 +2,6 @@ package com.example.Pill_Reminder_App.data.model;
 
 public class User {
     private String id;
-    private String userId;
     private String name;
     private String email;
     private String hashedPassword;
@@ -10,9 +9,8 @@ public class User {
 
     public User() {}
 
-    public User(String id, String userId, String name, String email, String hashedPassword, String userType) {
+    public User(String id, String name, String email, String hashedPassword, String userType) {
         this.id = id;
-        this.userId = userId;
         this.name = name;
         this.email = email;
         this.hashedPassword = hashedPassword;
@@ -21,9 +19,6 @@ public class User {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
-
-    public String getUserId() { return userId; }
-    public void setUserId(String userId) { this.userId = userId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
