@@ -10,19 +10,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.example.Pill_Reminder_App.data.model.MedicineForm;
-import com.example.Pill_Reminder_App.data.model.IntakeTime;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.Date;
 
 public class MedicineRepository {
     private final FirebaseFirestore db;
@@ -32,40 +27,48 @@ public class MedicineRepository {
         this.db = FirebaseFirestore.getInstance();
     }
 
-    public void add(String id, Map<String, Object> medicine, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+    public void add(Medicine medicine, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        Map<String, Object> medicineMap = toMap(medicine);
+        medicineMap.put("createdAt", new Date());
+
+        db.collection(COLLECTION_NAME)
+            .add(medicineMap)
+            .addOnSuccessListener(documentReference -> onSuccess.onSuccess(null))
+            .addOnFailureListener(onFailure);
+    }
+
+    public void update(String id, Medicine medicine, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        Map<String, Object> medicineMap = toMap(medicine);
+        // createdAt alanını güncelleme, çünkü bu alan sadece oluşturulduğunda set edilmeli
+
         db.collection(COLLECTION_NAME)
             .document(id)
-            .set(medicine)
-            .addOnSuccessListener(onSuccess)
-            .addOnFailureListener(onFailure);
-        this.db = FirebaseFirestore.getInstance();
-    }
-
-    public void add(String id, Map<String, Object> data, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME).document(id).set(data)
+            .update(medicineMap)
             .addOnSuccessListener(onSuccess)
             .addOnFailureListener(onFailure);
     }
 
-    public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME).get()
-            .addOnSuccessListener(querySnapshot -> {
-                List<MedicineDTO> medicines = new ArrayList<>();
-                for (var doc : querySnapshot.getDocuments()) {
-                    MedicineDTO medicine = fromMap(doc.getId(), doc.getData());
-                    medicines.add(medicine);
-                }
-                onSuccess.onSuccess(medicines);
-            })
+    public void delete(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .document(id)
+            .delete()
+            .addOnSuccessListener(onSuccess)
             .addOnFailureListener(onFailure);
     }
 
-    public void getById(String id, OnSuccessListener<MedicineDTO> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME).document(id).get()
+    public void getById(String id, OnSuccessListener<Medicine> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .document(id)
+            .get()
             .addOnSuccessListener(documentSnapshot -> {
                 if (documentSnapshot.exists()) {
-                    MedicineDTO medicine = fromMap(documentSnapshot.getId(), documentSnapshot.getData());
-                    onSuccess.onSuccess(medicine);
+                    Map<String, Object> data = documentSnapshot.getData();
+                    if (data != null) {
+                        Medicine medicine = fromMapToEntity(documentSnapshot.getId(), data);
+                        onSuccess.onSuccess(medicine);
+                    } else {
+                        onFailure.onFailure(new Exception("Medicine data is null"));
+                    }
                 } else {
                     onFailure.onFailure(new Exception("Medicine not found"));
                 }
@@ -73,15 +76,34 @@ public class MedicineRepository {
             .addOnFailureListener(onFailure);
     }
 
-    public void update(String id, Map<String, Object> data, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME).document(id).update(data)
-            .addOnSuccessListener(onSuccess)
+    public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<MedicineDTO> medicines = new ArrayList<>();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Map<String, Object> data = document.getData();
+                    MedicineDTO medicine = fromMap(document.getId(), data);
+                    medicines.add(medicine);
+                }
+                onSuccess.onSuccess(medicines);
+            })
             .addOnFailureListener(onFailure);
     }
 
-    public void delete(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME).document(id).delete()
-            .addOnSuccessListener(onSuccess)
+    public void getByUserId(String userId, OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
+        db.collection(COLLECTION_NAME)
+            .whereEqualTo("userId", userId)
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<MedicineDTO> medicines = new ArrayList<>();
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    Map<String, Object> data = document.getData();
+                    MedicineDTO medicine = fromMap(document.getId(), data);
+                    medicines.add(medicine);
+                }
+                onSuccess.onSuccess(medicines);
+            })
             .addOnFailureListener(onFailure);
     }
 
@@ -100,58 +122,6 @@ public class MedicineRepository {
                     // Hatalı ilaç verisini atla
                     continue;
                 }
-    public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                List<MedicineDTO> medicines = new ArrayList<>();
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    Medicine medicine = document.toObject(Medicine.class);
-                    medicine.setCode(document.getId());
-                    medicines.add(toDTO(medicine));
-                }
-                onSuccess.onSuccess(medicines);
-            })
-            .addOnFailureListener(onFailure);
-    }
-
-    public void getById(String id, OnSuccessListener<MedicineDTO> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME)
-            .document(id)
-            .get()
-            .addOnSuccessListener(documentSnapshot -> {
-                if (documentSnapshot.exists()) {
-                    Medicine medicine = documentSnapshot.toObject(Medicine.class);
-                    if (medicine != null) {
-                        medicine.setCode(documentSnapshot.getId());
-                        onSuccess.onSuccess(toDTO(medicine));
-                    }
-                }
-            })
-            .addOnFailureListener(onFailure);
-    }
-
-    public void update(String id, Map<String, Object> medicine, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME)
-            .document(id)
-            .update(medicine)
-            .addOnSuccessListener(onSuccess)
-            .addOnFailureListener(onFailure);
-    }
-
-    public void delete(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        db.collection(COLLECTION_NAME)
-            .document(id)
-            .delete()
-            .addOnSuccessListener(onSuccess)
-            .addOnFailureListener(onFailure);
-    }
-
-    public MedicineDTO toDTO(Medicine entity) {
-        List<DoseTimeDTO> doseTimeDTOs = new ArrayList<>();
-        if (entity.getDoseTimes() != null) {
-            for (DoseTime d : entity.getDoseTimes()) {
-                doseTimeDTOs.add(new DoseTimeDTO(d.getTime(), d.getAmount(), d.getUnit()));
             }
             return medicines;
         } catch (ExecutionException | InterruptedException e) {
@@ -172,47 +142,49 @@ public class MedicineRepository {
             }
         }
 
-        return new MedicineDTO(
-            entity.getName(),
-            entity.getForm() != null ? entity.getForm().name() : null,
-            entity.getFrequency(),
-            entity.getStartDate(),
-            doseTimeDTOs,
-            entity.getIntakeTime() != null ? entity.getIntakeTime().name() : null,
-            entity.getCode(),
-            entity.getDoctorId(),
-            entity.getUserId()
+        MedicineDTO medicine = new MedicineDTO(
             id,
             (String) map.get("name"),
             (String) map.get("form"),
             (String) map.get("frequency"),
-            (java.util.Date) map.get("startDate"),
+            (Date) map.get("startDate"),
             doseTimes,
             (String) map.get("intakeTime"),
             (String) map.get("code"),
             (String) map.get("doctorId"),
             (String) map.get("userId")
         );
+        medicine.setCreatedAt((Date) map.get("createdAt"));
+        return medicine;
     }
 
-    public Medicine fromDTO(MedicineDTO dto) {
+    private Medicine fromMapToEntity(String id, Map<String, Object> map) {
         List<DoseTime> doseTimes = new ArrayList<>();
-        if (dto.getDoseTimes() != null) {
-            for (DoseTimeDTO d : dto.getDoseTimes()) {
-                doseTimes.add(new DoseTime(d.getTime(), d.getAmount(), d.getUnit()));
+        if (map.get("doseTimes") != null) {
+            List<Map<String, Object>> doseList = (List<Map<String, Object>>) map.get("doseTimes");
+            for (Map<String, Object> d : doseList) {
+                doseTimes.add(new DoseTime(
+                    (String) d.get("time"),
+                    (Double) d.get("amount"),
+                    (String) d.get("unit")
+                ));
             }
         }
-        return new Medicine(
-            dto.getName(),
-            dto.getForm() != null ? MedicineForm.valueOf(dto.getForm()) : null,
-            dto.getFrequency(),
-            dto.getStartDate(),
+
+        Medicine medicine = new Medicine(
+            id,
+            (String) map.get("name"),
+            map.get("form") != null ? MedicineForm.valueOf((String) map.get("form")) : null,
+            (String) map.get("frequency"),
+            (Date) map.get("startDate"),
             doseTimes,
-            dto.getIntakeTime() != null ? IntakeTime.valueOf(dto.getIntakeTime()) : null,
-            dto.getCode(),
-            dto.getDoctorId(),
-            dto.getUserId()
+            map.get("intakeTime") != null ? IntakeTime.valueOf((String) map.get("intakeTime")) : null,
+            (String) map.get("code"),
+            (String) map.get("doctorId"),
+            (String) map.get("userId")
         );
+        medicine.setCreatedAt((Date) map.get("createdAt"));
+        return medicine;
     }
 
     public Map<String, Object> toMap(Medicine medicine) {
@@ -225,6 +197,8 @@ public class MedicineRepository {
         map.put("intakeTime", medicine.getIntakeTime() != null ? medicine.getIntakeTime().name() : null);
         map.put("doctorId", medicine.getDoctorId());
         map.put("userId", medicine.getUserId());
+        map.put("code", medicine.getCode());
+        map.put("createdAt", medicine.getCreatedAt());
         return map;
     }
 }

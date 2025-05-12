@@ -33,8 +33,8 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView loginLink;
     private FirebaseFirestore db;
-    private RadioGroup userTypeRadioGroup;
-    private RadioButton radioDoctor, radioPatient;
+    private RadioGroup userTypeGroup;
+    private RadioButton doctorRadio, patientRadio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +49,9 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput);
         registerButton = findViewById(R.id.registerButton);
         loginLink = findViewById(R.id.loginLink);
-        userTypeRadioGroup = findViewById(R.id.userTypeRadioGroup);
-        radioDoctor = findViewById(R.id.radioDoctor);
-        radioPatient = findViewById(R.id.radioPatient);
+        userTypeGroup = findViewById(R.id.userTypeGroup);
+        doctorRadio = findViewById(R.id.doctorRadio);
+        patientRadio = findViewById(R.id.patientRadio);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,11 +61,11 @@ public class RegisterActivity extends AppCompatActivity {
                 String password = passwordInput.getText().toString();
                 String confirmPassword = confirmPasswordInput.getText().toString();
 
-                int selectedId = userTypeRadioGroup.getCheckedRadioButtonId();
+                int selectedId = userTypeGroup.getCheckedRadioButtonId();
                 String userType;
-                if (selectedId == R.id.radioDoctor) {
+                if (selectedId == R.id.doctorRadio) {
                     userType = "doctor";
-                } else if (selectedId == R.id.radioPatient) {
+                } else if (selectedId == R.id.patientRadio) {
                     userType = "patient";
                 } else {
                     Toast.makeText(RegisterActivity.this, "Kullanıcı tipini seçin", Toast.LENGTH_SHORT).show();
@@ -111,6 +111,4 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
     }
-
-
 } 

@@ -185,4 +185,12 @@ public class AddMedicineActivity extends AppCompatActivity {
     public void setMedicineMealTime(String mealTime) {
         medicineDTO.setIntakeTime(mealTime);
     }
+
+    public String getMedicineCode() {
+        return medicineDTO.getCode();
+    }
+
+    public MedicineDTO getMedicineDTO() {
+        return medicineDTO;
+    }
 } 

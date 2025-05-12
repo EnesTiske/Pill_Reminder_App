@@ -75,4 +75,13 @@
         android:layout_height="wrap_content"
         android:text="Kayıt Ol"/>
 
+    <TextView
+        android:id="@+id/loginLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Zaten hesabınız var mı? Giriş yapın"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@color/design_default_color_primary"/>
+
 </LinearLayout> 

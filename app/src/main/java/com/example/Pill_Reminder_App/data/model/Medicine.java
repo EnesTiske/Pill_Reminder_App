@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Medicine {
+    private String id;
     private String name;
     private MedicineForm form;
     private String frequency;
@@ -14,10 +15,14 @@ public class Medicine {
     private String code;
     private String doctorId; // nullable
     private String userId; // ilacın bağlı olduğu kullanıcı (hasta) id'si
+    private Date createdAt;
 
-    public Medicine() {}
+    public Medicine() {
+        this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
+    }
 
-    public Medicine(String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId, String userId) {
+    public Medicine(String id, String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId, String userId) {
+        this.id = id;
         this.name = name;
         this.form = form;
         this.frequency = frequency;
@@ -27,7 +32,11 @@ public class Medicine {
         this.code = code;
         this.doctorId = doctorId;
         this.userId = userId;
+        this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
     }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -55,4 +64,7 @@ public class Medicine {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
 } 
