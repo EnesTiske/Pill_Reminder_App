@@ -32,7 +32,7 @@ public class MedicineDTO {
         this.code = code;
         this.doctorId = doctorId;
         this.userId = userId;
-        this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
+        this.createdAt = new Date();
     }
 
     public String getId() { return id; }

@@ -29,11 +29,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 
+import com.example.Pill_Reminder_App.data.dto.DoseTimeDTO;
+import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
+import com.example.Pill_Reminder_App.data.model.Medicine;
+import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +47,8 @@ import java.util.stream.Collectors;
 
 import com.example.Pill_Reminder_App.data.repository.MedAlarmRepository;
 import com.example.Pill_Reminder_App.data.dto.MedAlarmDTO;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 
 
@@ -131,7 +139,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createNotificationChannel();
-        medAlarmRepository = new MedAlarmRepository(requireContext());
+        medAlarmRepository = new MedAlarmRepository();
     }
 
     private void createNotificationChannel() {
@@ -284,10 +292,149 @@ public class HomeFragment extends Fragment {
     }
 
     // TODO ----
-    
+
+    private interface OnAlarmsMatchedListener {
+        void onMatched(List<MedAlarmDTO> matchedAlarms);
+    }
+
+    private void loadMedicinesFromFirebase(Date targetDate, OnAlarmsMatchedListener listener) {
+        MedicineRepository medicineRepository = new MedicineRepository();
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        
+        Calendar targetCal = Calendar.getInstance();
+        targetCal.setTime(targetDate);
+        targetCal.set(Calendar.HOUR_OF_DAY, 0);
+        targetCal.set(Calendar.MINUTE, 0);
+        targetCal.set(Calendar.SECOND, 0);
+        targetCal.set(Calendar.MILLISECOND, 0);
+        
+        boolean isPast = targetCal.before(today);
+        boolean isToday = isSameDay(targetCal, today);
+        
+        medicineRepository.getAll(new OnSuccessListener<List<MedicineDTO>>() {
+            @Override
+            public void onSuccess(List<MedicineDTO> medicines) {
+                List<MedAlarmDTO> matchedAlarms = new java.util.ArrayList<>();
+                for (MedicineDTO medicine : medicines) {
+                    String medicineName = medicine.getName();
+                    Date startDate = medicine.getStartDate();
+                    if (startDate != null && !startDate.after(targetDate)) {
+                        int frequency = Integer.parseInt(medicine.getFrequency());
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(startDate);
+                        cal.set(Calendar.HOUR_OF_DAY, 0);
+                        cal.set(Calendar.MINUTE, 0);
+                        cal.set(Calendar.SECOND, 0);
+                        cal.set(Calendar.MILLISECOND, 0);
+
+                        long diff = targetCal.getTimeInMillis() - cal.getTimeInMillis();
+                        long days = diff / (1000 * 60 * 60 * 24);
+                        if (days % frequency == 0) {
+                            for (DoseTimeDTO dose : medicine.getDoseTimes()) {
+                                MedAlarmDTO newAlarm = new MedAlarmDTO(
+                                    null,
+                                    dose.getTime(),
+                                    medicineName,
+                                    dose.getAmount() + " " + dose.getUnit(),
+                                    new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(targetDate),
+                                    isToday ? "PENDING" : "FUTURE",
+                                    medicine.getUserId(),
+                                    medicine.getCode()
+                                );
+                                matchedAlarms.add(newAlarm);
+                            }
+                        }
+                    }
+                }
+                if (!isPast) {
+                    listener.onMatched(matchedAlarms);
+                } else {
+                    // Geçmiş tarih için MedAlarm tablosundan verileri çek
+                    medAlarmRepository.getAll(new OnSuccessListener<List<MedAlarmDTO>>() {
+                        @Override
+                        public void onSuccess(List<MedAlarmDTO> medAlarms) {
+                            // Tarihe göre filtrele
+                            List<MedAlarmDTO> filteredAlarms = medAlarms.stream()
+                                .filter(alarm -> {
+                                    try {
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                        Date alarmDate = sdf.parse(alarm.getDate());
+                                        return alarmDate != null && isSameDay(alarmDate, targetDate);
+                                    } catch (Exception e) {
+                                        return false;
+                                    }
+                                })
+                                .collect(Collectors.toList());
+                            
+                            // Olması gereken alarmı bulamazsak ekle
+                            for (MedicineDTO medicine : medicines) {
+                                for (DoseTimeDTO dose : medicine.getDoseTimes()) {
+                                    boolean exists = filteredAlarms.stream().anyMatch(alarm ->
+                                        alarm.getMedicineName().equals(medicine.getName()) &&
+                                        alarm.getTime().equals(dose.getTime())
+                                    );
+                                    if (!exists) {
+                                        MedAlarmDTO missedAlarm = new MedAlarmDTO(
+                                            null,
+                                            dose.getTime(),
+                                            medicine.getName(),
+                                            dose.getAmount() + " " + dose.getUnit(),
+                                            new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(targetDate),
+                                            "TAKEN",
+                                            medicine.getUserId(),
+                                            medicine.getCode()
+                                        );
+                                        medAlarmRepository.add(missedAlarm, new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                // Alarm başarıyla eklendi
+                                            }
+                                        }, new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(Exception e) {
+                                                Toast.makeText(getContext(), "Alarm ekleme hatası: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                        filteredAlarms.add(missedAlarm);
+                                    }
+                                }
+                            }
+                            matchedAlarms.addAll(filteredAlarms);
+                            listener.onMatched(matchedAlarms);
+                        }
+                    }, new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(getContext(), "Geçmiş alarmlar yüklenirken hata: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            listener.onMatched(matchedAlarms);
+                        }
+                    });
+                }
+            }
+        }, new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Hata: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                listener.onMatched(new java.util.ArrayList<>());
+            }
+        });
+    }
+
     private boolean isSameDay(Calendar a, Calendar b) {
-        return a.get(Calendar.YEAR)==b.get(Calendar.YEAR)
-                && a.get(Calendar.DAY_OF_YEAR)==b.get(Calendar.DAY_OF_YEAR);
+        return a.get(Calendar.YEAR) == b.get(Calendar.YEAR)
+                && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private boolean isSameDay(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(date1);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(date2);
+        return isSameDay(cal1, cal2);
     }
 
     private void populateMedicineList(View rootView) {
@@ -295,31 +442,16 @@ public class HomeFragment extends Fragment {
         if (layoutMeds == null) return;
         layoutMeds.removeAllViews();
 
-        // Bugünün tarihini al
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        String currentDate = dateFormat.format(selectedDate.getTime());
+        // Firebase'den ilaçları çek
+        loadMedicinesFromFirebase(selectedDate.getTime(), new OnAlarmsMatchedListener() {
+            @Override
+            public void onMatched(List<MedAlarmDTO> matchedAlarms) {
 
-        List<MedAlarmDTO> allMedAlarms = Arrays.asList(
-            new MedAlarmDTO(1, "12:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(2, "12:00", "Aferin", "2 tablet", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(3, "12:00", "Vitamin C", "1 kapsül", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(4, "15:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(5, "15:00", "Aferin", "2 tablet", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(6, "15:00", "Vitamin D", "1 kapsül", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(7, "18:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(8, "18:00", "Aferin", "2 tablet", "2025-05-14", "PENDING", "user1"),
-            new MedAlarmDTO(9, "18:00", "B12", "1 ampul", "2025-05-12", "PENDING", "user1"),
-            new MedAlarmDTO(10, "21:00", "Parol", "1 tablet", "2025-05-13", "PENDING", "user1"),
-            new MedAlarmDTO(11, "21:00", "Aferin", "2 tablet", "2025-05-14", "PENDING", "user1"),
-            new MedAlarmDTO(12, "21:00", "Vitamin C", "1 kapsül", "2025-05-15", "PENDING", "user1")
-        );
+                matchedAlarms.sort((a, b) -> a.getTime().compareTo(b.getTime()));
+                processMedicineList(matchedAlarms, layoutMeds);
 
-        // Seçili tarihe göre filtrele
-        List<MedAlarmDTO> filteredMedAlarms = allMedAlarms.stream()
-            .filter(alarm -> alarm.getDate().equals(currentDate))
-            .collect(Collectors.toList());
-
-        processMedicineList(filteredMedAlarms, layoutMeds);
+            }
+        });
     }
 
     private void processMedicineList(List<MedAlarmDTO> medAlarms, LinearLayout layoutMeds) {
@@ -349,38 +481,30 @@ public class HomeFragment extends Fragment {
             tvMedAmount.setText(medAlarm.getAmount());
             CheckBox cbTaken = medItem.findViewById(R.id.cbTaken);
             
-            // İlaç durumuna göre checkbox'ı ayarla
-            cbTaken.setChecked(medAlarm.getState().equals("TAKEN"));
+            // İlaç durumuna göre arka plan ve checkbox'ı ayarla
+            if (medAlarm.getState().equals("MISSED")) {
+                medItem.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.med_missed_bg));
+                cbTaken.setChecked(true);
+            } else if (medAlarm.getState().equals("TAKEN")) {
+                medItem.setBackgroundColor(ContextCompat.getColor(getContext(), R.color.med_taken_bg));
+                cbTaken.setChecked(true);
+            } else {
+                medItem.setBackgroundColor(Color.WHITE);
+                cbTaken.setChecked(false);
+            }
             
             cbTaken.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     tvMedName.setPaintFlags(tvMedName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     medAlarm.setState("TAKEN");
+
                 } else {
                     tvMedName.setPaintFlags(tvMedName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                    
-                    // Alarm tarihini Calendar nesnesine çevir
-                    Calendar alarmDate = Calendar.getInstance();
-                    String[] dateParts = medAlarm.getDate().split("-");
-                    alarmDate.set(Integer.parseInt(dateParts[0]), 
-                                Integer.parseInt(dateParts[1]) - 1, 
-                                Integer.parseInt(dateParts[2]));
-                    alarmDate.set(Calendar.HOUR_OF_DAY, 0);
-                    alarmDate.set(Calendar.MINUTE, 0);
-                    alarmDate.set(Calendar.SECOND, 0);
-                    alarmDate.set(Calendar.MILLISECOND, 0);
-                    
-                    // Tarihi karşılaştır ve durumu güncelle
-                    if (alarmDate.before(today)) {
-                        medAlarm.setState("MISSED");
-                    } else {
-                        medAlarm.setState("PENDING");
-                    }
+                    medAlarm.setState("MISSED");
+
                 }
-                // Veritabanı güncellemesi geçici olarak kaldırıldı
-                // medAlarmRepository.updateState(medAlarm.getId(), medAlarm.getState());
             });
             layoutMeds.addView(medItem);
         }

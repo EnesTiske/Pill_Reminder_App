@@ -9,7 +9,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.List;
 
-
 public class MedAlarmService implements IService<MedAlarmDTO> {
     private Context context;
     private AlarmManager alarmManager;
@@ -45,8 +44,6 @@ public class MedAlarmService implements IService<MedAlarmDTO> {
 
     @Override
     public void delete(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
-
-
 } 

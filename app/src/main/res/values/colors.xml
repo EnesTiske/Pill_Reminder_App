@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="selectedDay">#2196F3</color>
     <color name="unselectedDay">#E0E0E0</color>
+    <color name="med_missed_bg">#FFCDD2</color>
+    <color name="med_taken_bg">#C8E6C9</color>
 </resources>

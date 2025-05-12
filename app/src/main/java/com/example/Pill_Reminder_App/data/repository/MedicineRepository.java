@@ -19,13 +19,21 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.Date;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MedicineRepository {
     private final FirebaseFirestore db;
+    private final DatabaseReference medicinesRef;
     private static final String COLLECTION_NAME = "medicines";
 
     public MedicineRepository() {
         this.db = FirebaseFirestore.getInstance();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        medicinesRef = database.getReference("medicines");
     }
 
     public void add(Medicine medicine, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
@@ -77,7 +85,7 @@ public class MedicineRepository {
             .addOnFailureListener(onFailure);
     }
 
-    public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
+        public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
         db.collection(COLLECTION_NAME)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -285,5 +293,33 @@ public class MedicineRepository {
         map.put("code", medicine.getCode());
         map.put("createdAt", medicine.getCreatedAt());
         return map;
+    }
+
+    public interface OnMedicinesLoadedListener {
+        void onMedicinesLoaded(List<Medicine> medicines);
+        void onError(String error);
+    }
+
+    public void getMedicinesBeforeDate(Date date, OnMedicinesLoadedListener listener) {
+        medicinesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Medicine> medicines = new ArrayList<>();
+                
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Medicine medicine = snapshot.getValue(Medicine.class);
+                    if (medicine != null && medicine.getStartDate().before(date)) {
+                        medicines.add(medicine);
+                    }
+                }
+                
+                listener.onMedicinesLoaded(medicines);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onError(databaseError.getMessage());
+            }
+        });
     }
 }

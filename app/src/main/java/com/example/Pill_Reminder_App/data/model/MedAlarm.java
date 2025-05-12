@@ -8,10 +8,11 @@ public class MedAlarm {
     private String date;
     private String state;
     private String userId;
+    private String code;
 
     public MedAlarm() {}
 
-    public MedAlarm(int id, String time, String medicineName, String amount, String date, String state, String userId) {
+    public MedAlarm(int id, String time, String medicineName, String amount, String date, String state, String userId, String code) {
         this.id = id;
         this.time = time;
         this.medicineName = medicineName;
@@ -19,6 +20,7 @@ public class MedAlarm {
         this.date = date;
         this.state = state;
         this.userId = userId;
+        this.code = code;
     }
 
     // Getters
@@ -29,6 +31,7 @@ public class MedAlarm {
     public String getDate() { return date; }
     public String getState() { return state; }
     public String getUserId() { return userId; }
+    public String getCode() { return code; }
 
     // Setters
     public void setId(int id) { this.id = id; }
@@ -38,4 +41,5 @@ public class MedAlarm {
     public void setDate(String date) { this.date = date; }
     public void setState(String state) { this.state = state; }
     public void setUserId(String userId) { this.userId = userId; }
+    public void setCode(String code) { this.code = code; }
 } 

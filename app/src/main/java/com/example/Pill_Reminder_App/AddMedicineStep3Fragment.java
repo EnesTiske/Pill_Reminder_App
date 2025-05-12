@@ -55,7 +55,12 @@ public class AddMedicineStep3Fragment extends Fragment {
         }
         selectedIndex = index;
         
-        if (index == 1) {
+        if (index == 0) {
+            selectedFrequency = "1";
+            if (getActivity() instanceof AddMedicineActivity) {
+                ((AddMedicineActivity) getActivity()).setMedicineFrequency(selectedFrequency);
+            }
+        } else if (index == 1) {
             showCertainDaysDialog();
         } else {
             showFrequencyDialog();
@@ -84,16 +89,16 @@ public class AddMedicineStep3Fragment extends Fragment {
             
             switch (selectedIndex) {
                 case 0: // Her gün
-                    frequency = "Her gün";
+                    frequency = String.valueOf(1);
                     break;
                 case 2: // X günde bir
-                    frequency = value + " günde bir";
+                    frequency = String.valueOf(value);
                     break;
                 case 3: // X haftada bir
-                    frequency = value + " haftada bir";
+                    frequency = String.valueOf(value * 7);
                     break;
                 case 4: // X ayda bir
-                    frequency = value + " ayda bir";
+                    frequency = String.valueOf(value * 30);
                     break;
             }
             

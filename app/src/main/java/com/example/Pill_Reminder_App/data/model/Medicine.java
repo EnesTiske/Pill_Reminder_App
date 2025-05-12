@@ -1,6 +1,5 @@
 package com.example.Pill_Reminder_App.data.model;
 
-import com.google.firebase.firestore.DocumentId;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class Medicine {
     private List<DoseTime> doseTimes;
     private IntakeTime intakeTime;
     private String code;
-    private String doctorId; // nullable
+    private String doctorId;
     private String email;
     private Date createdAt;
 
@@ -21,7 +20,7 @@ public class Medicine {
         this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
     }
 
-    public Medicine(String id, String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId, String userId) {
+    public Medicine(String id, String name, MedicineForm form, String frequency, Date startDate, List<DoseTime> doseTimes, IntakeTime intakeTime, String code, String doctorId, String email) {
         this.id = id;
         this.name = name;
         this.form = form;
@@ -32,7 +31,7 @@ public class Medicine {
         this.code = code;
         this.doctorId = doctorId;
         this.email = email;
-        this.createdAt = new Date(); // Varsayılan olarak şu anki zamanı ata
+        this.createdAt = new Date();
     }
 
     public String getId() { return id; }
