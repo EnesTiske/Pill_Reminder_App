@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -46,9 +47,21 @@ public class AddMedicineStep5Fragment extends Fragment {
         TextView tvTime = row.findViewById(R.id.tvTime);
         TextView tvDose = row.findViewById(R.id.tvDose);
         ImageView ivArrow = row.findViewById(R.id.ivArrow);
+        ImageView ivDelete = row.findViewById(R.id.ivDelete);
 
         tvTime.setText(time);
         tvDose.setText(dose + " Hap");
+
+        // Silme butonu tıklama olayı
+        ivDelete.setOnClickListener(v -> {
+            // En az bir satır kalmalı
+            if (timesContainer.getChildCount() > 1) {
+                timesContainer.removeView(row);
+                updateTimeDoseList();
+            } else {
+                Toast.makeText(getContext(), "En az bir doz zamanı olmalıdır", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         tvTime.setOnClickListener(v -> {
             // Saat seçici aç

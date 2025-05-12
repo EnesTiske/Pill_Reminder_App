@@ -42,7 +42,8 @@ public class AddMedicineStep1Fragment extends Fragment {
 
     public boolean isStepValid() {
         String medicineName = medicineNameEditText.getText().toString().trim();
-        if (medicineName.isEmpty()) {
+        if (medicineName.isEmpty() || medicineName.length() < 2) {
+            medicineNameEditText.setError("İlaç adı en az 2 karakter olmalıdır");
             return false;
         }
 

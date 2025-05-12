@@ -145,6 +145,18 @@ public class AddMedicineActivity extends AppCompatActivity {
     }
 
     public void nextStep() {
+        // Mevcut adımın geçerliliğini kontrol et
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragmentContainer);
+        boolean isStepValid = true;
+
+        if (currentFragment instanceof AddMedicineStep1Fragment) {
+            isStepValid = ((AddMedicineStep1Fragment) currentFragment).isStepValid();
+        }
+
+        if (!isStepValid) {
+            return;
+        }
+
         if (currentStep < stepAmount) {
             currentStep++;
             showStep(currentStep);

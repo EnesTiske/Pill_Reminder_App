@@ -15,6 +15,7 @@ import android.widget.DatePicker;
 import android.widget.NumberPicker;
 import java.util.Calendar;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
 public class AddMedicineStep3Fragment extends Fragment {
     private TextView[] options;
@@ -162,7 +163,19 @@ public class AddMedicineStep3Fragment extends Fragment {
     }
 
     public boolean isStepValid() {
+        if (selectedIndex == -1) {
+            // Hiçbir seçenek seçilmemiş
+            Toast.makeText(getContext(), "Lütfen bir sıklık seçeneği seçin", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         if (selectedFrequency == null || selectedFrequency.isEmpty()) {
+            // Seçenek seçilmiş ama detay seçilmemiş
+            if (selectedIndex == 1) { // Belirli günler seçeneği
+                Toast.makeText(getContext(), "Lütfen en az bir gün seçin", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(getContext(), "Lütfen sıklık değerini seçin", Toast.LENGTH_SHORT).show();
+            }
             return false;
         }
 

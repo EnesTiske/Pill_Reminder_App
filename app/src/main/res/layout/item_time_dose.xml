@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:paddingVertical="8dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/tvTime"
-        android:layout_width="72dp"
-        android:layout_height="40dp"
-        android:background="@drawable/time_bg"
-        android:gravity="center"
-        android:text="08:00"
-        android:textSize="18sp"
-        android:textColor="#263238"
-        android:layout_marginEnd="16dp"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="08:00" />
 
     <TextView
         android:id="@+id/tvDose"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="1 Hap"
-        android:textSize="18sp"
-        android:gravity="end"
-        android:textColor="#263238"/>
+        android:textAlignment="textEnd"
+        android:textSize="16sp"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackground"
+        android:text="1 Hap" />
 
     <ImageView
         android:id="@+id/ivArrow"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_arrow_drop_down"
-        android:tint="#263238"
-        android:layout_marginStart="8dp"/>
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_arrow_right" />
+
+    <ImageView
+        android:id="@+id/ivDelete"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_delete"
+        android:background="?attr/selectableItemBackground"
+        android:padding="2dp" />
+
 </LinearLayout> 
