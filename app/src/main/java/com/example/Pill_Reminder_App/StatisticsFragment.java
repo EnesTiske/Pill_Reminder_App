@@ -40,19 +40,53 @@ public class StatisticsFragment extends Fragment {
         }
         List<DayStat> days = Arrays.asList(
             new DayStat("Pazartesi", Arrays.asList(
-                new MedRow("Parol 1 tablet", 1, 1),
-                new MedRow("Aferin 2 tablet", 1, 2),
-                new MedRow("Vitamin C 1 kapsül", 0, 1)
+                new MedRow("Parol 1 tablet", 3, 3),
+                new MedRow("Aferin 2 tablet", 2, 2),
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("Aspirin 1 tablet", 1, 1),
+                new MedRow("Nurofen 1 tablet", 1, 1)
             )),
             new DayStat("Salı", Arrays.asList(
-                new MedRow("Parol 1 tablet", 0, 1),
-                new MedRow("Aferin 2 tablet", 0, 2),
-                new MedRow("Vitamin C 1 kapsül", 0, 1)
+                new MedRow("Parol 1 tablet", 2, 3),
+                new MedRow("Aferin 2 tablet", 1, 2),
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("Majezik 1 tablet", 1, 1),
+                new MedRow("Vitamin D 1 kapsül", 1, 1)
             )),
             new DayStat("Çarşamba", Arrays.asList(
-                new MedRow("Parol 1 tablet", 1, 1),
+                new MedRow("Parol 1 tablet", 3, 3),
                 new MedRow("Aferin 2 tablet", 2, 2),
-                new MedRow("Vitamin C 1 kapsül", 1, 1)
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("B12 1 ampul", 1, 1),
+                new MedRow("Deltacortril 1 tablet", 1, 1)
+            )),
+            new DayStat("Perşembe", Arrays.asList(
+                new MedRow("Parol 1 tablet", 3, 3),
+                new MedRow("Aferin 2 tablet", 2, 2),
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("Zyrtec 1 tablet", 1, 1),
+                new MedRow("Magnezyum 1 tablet", 1, 1)
+            )),
+            new DayStat("Cuma", Arrays.asList(
+                new MedRow("Parol 1 tablet", 2, 3),
+                new MedRow("Aferin 2 tablet", 1, 2),
+                new MedRow("Vitamin C 1 kapsül", 0, 1),
+                new MedRow("D Vitamini 1 damla", 1, 1),
+                new MedRow("Aspirin 1 tablet", 1, 1)
+            )),
+            new DayStat("Cumartesi", Arrays.asList(
+                new MedRow("Parol 1 tablet", 3, 3),
+                new MedRow("Aferin 2 tablet", 2, 2),
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("Nurofen 1 tablet", 1, 1),
+                new MedRow("Majezik 1 tablet", 1, 1)
+            )),
+            new DayStat("Pazar", Arrays.asList(
+                new MedRow("Parol 1 tablet", 2, 3),
+                new MedRow("Aferin 2 tablet", 1, 2),
+                new MedRow("Vitamin C 1 kapsül", 1, 1),
+                new MedRow("B12 1 ampul", 1, 1),
+                new MedRow("Deltacortril 1 tablet", 1, 1)
             ))
         );
 

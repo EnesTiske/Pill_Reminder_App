@@ -4,9 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -22,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,14 +38,17 @@ import java.util.Locale;
 import java.util.Arrays;
 import java.util.List;
 
-import com.example.Pill_Reminder_App.data.dto.MedicineDTO;
-import com.example.Pill_Reminder_App.data.repository.MedicineRepository;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.example.Pill_Reminder_App.utils.UserSessionManager;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+
+
+
+
+
 
 public class HomeFragment extends Fragment {
+    private static final String CHANNEL_ID = "pill_reminder_channel";
+    private static final int NOTIFICATION_ID = 1;
+    
     private Calendar selectedDate = Calendar.getInstance();
     private LinearLayout layoutDays;
     private TextView tvDayName, tvDate;
@@ -47,16 +56,16 @@ public class HomeFragment extends Fragment {
 
     private boolean isFabOpen = false;
 
-    private MedicineRepository medicineRepository;
-    private LinearLayout layoutMedicines;
-    private UserSessionManager sessionManager;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        medicineRepository = new MedicineRepository();
-        sessionManager = new UserSessionManager(requireContext());
-    }
+
+
+
+
+
+
+
+
+
 
     @Nullable
     @Override
@@ -107,15 +116,48 @@ public class HomeFragment extends Fragment {
         });
 
         updateCalendar();
-        layoutMedicines = view.findViewById(R.id.layoutMedicines);
-        loadMedicines();
+        populateMedicineList(view);
+
         return view;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        loadMedicines(); // Fragment her görünür olduğunda ilaçları yeniden yükle
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "İlaç Hatırlatıcı";
+            String description = "İlaç hatırlatma bildirimleri için kanal";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            
+            NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void sendNotification(String medicineName, String amount) {
+        Context context = requireContext();
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentTitle("İlaç Zamanı!")
+                .setContentText(medicineName + " - " + amount + " almanız gerekiyor")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .setVibrate(new long[]{0, 500, 200, 500})
+                .setLights(Color.RED, 3000, 3000);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     private void toggleFab() {
@@ -179,6 +221,7 @@ public class HomeFragment extends Fragment {
             animatorSet.start();
 
             fab.animate().rotation(45f).setDuration(300).start();
+            sendNotification("Aferin", "2 tablet");
         }
 
         isFabOpen = !isFabOpen;
@@ -236,87 +279,67 @@ public class HomeFragment extends Fragment {
                 && a.get(Calendar.DAY_OF_YEAR)==b.get(Calendar.DAY_OF_YEAR);
     }
 
-    private void loadMedicines() {
-        String userEmail = sessionManager.getUserEmail();
-        if (userEmail == null || userEmail.isEmpty()) {
-            Toast.makeText(requireContext(), "Kullanıcı bilgisi bulunamadı", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void populateMedicineList(View rootView) {
+        LinearLayout layoutMeds = rootView.findViewById(R.id.layoutMeds);
+        if (layoutMeds == null) return;
+        layoutMeds.removeAllViews();
 
-        // Kullanıcının ilaçlarını getir
-        medicineRepository.getByUserEmail(userEmail,
-            new OnSuccessListener<List<MedicineDTO>>() {
-                @Override
-                public void onSuccess(List<MedicineDTO> medicines) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            if (medicines != null) {
-                                displayMedicines(medicines);
-                            } else {
-                                showEmptyList();
-                            }
-                        });
-                    }
-                }
-            },
-            new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            Toast.makeText(getContext(), "İlaçlar yüklenirken hata oluştu: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            showEmptyList();
-                        });
-                    }
-                }
-            }
+        // Örnek veri: saat, ilaç adı, miktar
+        class Med {
+            String time, name, amount;
+            Med(String t, String n, String a) { time = t; name = n; amount = a; }
+        }
+        List<Med> meds = Arrays.asList(
+                new Med("12:00", "Parol", "1 tablet"),
+                new Med("12:00", "Aferin", "2 tablet"),
+                new Med("12:00", "Vitamin C", "1 kapsül"),
+                new Med("12:00", "Aspirin", "1 tablet"),
+                new Med("12:00", "Nurofen", "1 tablet"),
+                new Med("15:00", "Parol", "1 tablet"),
+                new Med("15:00", "Aferin", "2 tablet"),
+                new Med("15:00", "Vitamin D", "1 kapsül"),
+                new Med("15:00", "Majezik", "1 tablet"),
+                new Med("18:00", "Parol", "1 tablet"),
+                new Med("18:00", "Aferin", "2 tablet"),
+                new Med("18:00", "B12", "1 ampul"),
+                new Med("18:00", "Deltacortril", "1 tablet"),
+                new Med("21:00", "Parol", "1 tablet"),
+                new Med("21:00", "Aferin", "2 tablet"),
+                new Med("21:00", "Vitamin C", "1 kapsül"),
+                new Med("21:00", "Zyrtec", "1 tablet"),
+                new Med("24:00", "Parol", "1 tablet"),
+                new Med("24:00", "Aferin", "2 tablet"),
+                new Med("24:00", "Magnezyum", "1 tablet"),
+                new Med("24:00", "D Vitamini", "1 damla")
         );
-    }
 
-    private void showEmptyList() {
-        layoutMedicines.removeAllViews();
-        TextView noMedicinesText = new TextView(requireContext());
-        noMedicinesText.setText("Henüz ilaç eklenmemiş");
-        noMedicinesText.setTextSize(16);
-        noMedicinesText.setPadding(32, 32, 32, 32);
-        layoutMedicines.addView(noMedicinesText);
-    }
-
-    private void displayMedicines(List<MedicineDTO> medicines) {
-        layoutMedicines.removeAllViews();
-        
-        if (medicines.isEmpty()) {
-            showEmptyList();
-            return;
-        }
-
-        for (MedicineDTO medicine : medicines) {
-            if (medicine != null && medicine.getName() != null) {
-                View medItem = LayoutInflater.from(getContext()).inflate(R.layout.medicines_item, layoutMedicines, false);
-                
-                TextView tvMedName = medItem.findViewById(R.id.tvMedName);
-                TextView tvMedMealInfo = medItem.findViewById(R.id.tvMedMealInfo);
-                TextView tvMedNextReminder = medItem.findViewById(R.id.tvMedNextReminder);
-                
-                tvMedName.setText(medicine.getName());
-                
-                // Alım zamanı bilgisini göster
-                String intakeTime = medicine.getIntakeTime() != null ? medicine.getIntakeTime() : "Belirtilmemiş";
-                tvMedMealInfo.setText("Alım Zamanı: " + intakeTime);
-                
-                // Sonraki hatırlatma zamanını göster
-                String nextReminder = calculateNextReminder(medicine);
-                tvMedNextReminder.setText("Sonraki Hatırlatma: " + nextReminder);
-                
-                layoutMedicines.addView(medItem);
+        String lastTime = "";
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        for (Med med : meds) {
+            if (!med.time.equals(lastTime)) {
+                // Saat başlığı ekle
+                View header = inflater.inflate(R.layout.med_time_header, layoutMeds, false);
+                ((TextView)header.findViewById(R.id.tvTimeHeader)).setText(med.time);
+                layoutMeds.addView(header);
+                lastTime = med.time;
             }
+            // İlaç kutusu ekle
+            View medItem = inflater.inflate(R.layout.med_item, layoutMeds, false);
+            TextView tvMedName = medItem.findViewById(R.id.tvMedName);
+            TextView tvMedAmount = medItem.findViewById(R.id.tvMedAmount);
+            tvMedName.setText(med.name);
+            tvMedAmount.setText(med.amount);
+            CheckBox cbTaken = medItem.findViewById(R.id.cbTaken);
+            cbTaken.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    tvMedName.setPaintFlags(tvMedName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    tvMedName.setPaintFlags(tvMedName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                }
+            });
+            layoutMeds.addView(medItem);
         }
-    }
-
-    private String calculateNextReminder(MedicineDTO medicine) {
-        if (medicine.getDoseTimes() != null && !medicine.getDoseTimes().isEmpty()) {
-            return medicine.getDoseTimes().get(0).getTime();
-        }
-        return "Belirlenmedi";
     }
 }
