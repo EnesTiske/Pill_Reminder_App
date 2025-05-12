@@ -34,8 +34,7 @@ public class AddMedicineStep7Fragment extends Fragment {
 
         // Kullanıcı tipi kontrolü
         if (!sessionManager.isDoctor()) {
-            Toast.makeText(requireContext(), "Bu sayfaya sadece doktorlar erişebilir", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getActivity(), com.example.Pill_Reminder_App.ui.patient.PatientHomeActivity.class));
+            Toast.makeText(getContext(), "İlaç başarıyla eklendi", Toast.LENGTH_LONG).show();
             getActivity().finish();
             return view;
         }

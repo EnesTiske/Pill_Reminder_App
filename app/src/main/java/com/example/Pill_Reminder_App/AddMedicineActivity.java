@@ -197,10 +197,7 @@ public class AddMedicineActivity extends AppCompatActivity {
         medicineService.add(
                 medicineDTO,
                 unused -> {
-                    // ✅ Başarılı işlem: kodu yeni ekrana ilet
-                    Intent intent = new Intent(this, com.example.Pill_Reminder_App.ui.doctor.MedicineCreatedActivity.class);
-                    intent.putExtra("medicineCode", uniqueCode);
-                    startActivity(intent);
+                    // ✅ Başarılı işlem: kullanıcı tipine göre yönlendirme yap
                     finish();
                 },
                 e -> {
