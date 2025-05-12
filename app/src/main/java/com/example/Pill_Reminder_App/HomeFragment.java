@@ -37,6 +37,10 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.example.Pill_Reminder_App.data.repository.MedAlarmRepository;
+import com.example.Pill_Reminder_App.data.dto.MedAlarmDTO;
 
 
 
@@ -55,6 +59,8 @@ public class HomeFragment extends Fragment {
     private FloatingActionButton fab, fabAddMedicine, fabAddAlarm;
 
     private boolean isFabOpen = false;
+
+    private MedAlarmRepository medAlarmRepository;
 
 
 
@@ -125,6 +131,7 @@ public class HomeFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         createNotificationChannel();
+        medAlarmRepository = new MedAlarmRepository(requireContext());
     }
 
     private void createNotificationChannel() {
@@ -268,12 +275,16 @@ public class HomeFragment extends Fragment {
                 selectedDate = (Calendar) weekStart.clone();
                 selectedDate.add(Calendar.DATE, off);
                 updateCalendar();
+                // Tarih değiştiğinde ilaç listesini güncelle
+                populateMedicineList(getView());
             });
 
             layoutDays.addView(dayView);
         }
     }
 
+    // TODO ----
+    
     private boolean isSameDay(Calendar a, Calendar b) {
         return a.get(Calendar.YEAR)==b.get(Calendar.YEAR)
                 && a.get(Calendar.DAY_OF_YEAR)==b.get(Calendar.DAY_OF_YEAR);
@@ -284,60 +295,92 @@ public class HomeFragment extends Fragment {
         if (layoutMeds == null) return;
         layoutMeds.removeAllViews();
 
-        // Örnek veri: saat, ilaç adı, miktar
-        class Med {
-            String time, name, amount;
-            Med(String t, String n, String a) { time = t; name = n; amount = a; }
-        }
-        List<Med> meds = Arrays.asList(
-                new Med("12:00", "Parol", "1 tablet"),
-                new Med("12:00", "Aferin", "2 tablet"),
-                new Med("12:00", "Vitamin C", "1 kapsül"),
-                new Med("12:00", "Aspirin", "1 tablet"),
-                new Med("12:00", "Nurofen", "1 tablet"),
-                new Med("15:00", "Parol", "1 tablet"),
-                new Med("15:00", "Aferin", "2 tablet"),
-                new Med("15:00", "Vitamin D", "1 kapsül"),
-                new Med("15:00", "Majezik", "1 tablet"),
-                new Med("18:00", "Parol", "1 tablet"),
-                new Med("18:00", "Aferin", "2 tablet"),
-                new Med("18:00", "B12", "1 ampul"),
-                new Med("18:00", "Deltacortril", "1 tablet"),
-                new Med("21:00", "Parol", "1 tablet"),
-                new Med("21:00", "Aferin", "2 tablet"),
-                new Med("21:00", "Vitamin C", "1 kapsül"),
-                new Med("21:00", "Zyrtec", "1 tablet"),
-                new Med("24:00", "Parol", "1 tablet"),
-                new Med("24:00", "Aferin", "2 tablet"),
-                new Med("24:00", "Magnezyum", "1 tablet"),
-                new Med("24:00", "D Vitamini", "1 damla")
+        // Bugünün tarihini al
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String currentDate = dateFormat.format(selectedDate.getTime());
+
+        List<MedAlarmDTO> allMedAlarms = Arrays.asList(
+            new MedAlarmDTO(1, "12:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(2, "12:00", "Aferin", "2 tablet", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(3, "12:00", "Vitamin C", "1 kapsül", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(4, "15:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(5, "15:00", "Aferin", "2 tablet", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(6, "15:00", "Vitamin D", "1 kapsül", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(7, "18:00", "Parol", "1 tablet", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(8, "18:00", "Aferin", "2 tablet", "2025-05-14", "PENDING", "user1"),
+            new MedAlarmDTO(9, "18:00", "B12", "1 ampul", "2025-05-12", "PENDING", "user1"),
+            new MedAlarmDTO(10, "21:00", "Parol", "1 tablet", "2025-05-13", "PENDING", "user1"),
+            new MedAlarmDTO(11, "21:00", "Aferin", "2 tablet", "2025-05-14", "PENDING", "user1"),
+            new MedAlarmDTO(12, "21:00", "Vitamin C", "1 kapsül", "2025-05-15", "PENDING", "user1")
         );
 
+        // Seçili tarihe göre filtrele
+        List<MedAlarmDTO> filteredMedAlarms = allMedAlarms.stream()
+            .filter(alarm -> alarm.getDate().equals(currentDate))
+            .collect(Collectors.toList());
+
+        processMedicineList(filteredMedAlarms, layoutMeds);
+    }
+
+    private void processMedicineList(List<MedAlarmDTO> medAlarms, LinearLayout layoutMeds) {
         String lastTime = "";
         LayoutInflater inflater = LayoutInflater.from(getContext());
-        for (Med med : meds) {
-            if (!med.time.equals(lastTime)) {
+        
+        // Bugünün tarihini al
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+        
+        for (MedAlarmDTO medAlarm : medAlarms) {
+            if (!medAlarm.getTime().equals(lastTime)) {
                 // Saat başlığı ekle
                 View header = inflater.inflate(R.layout.med_time_header, layoutMeds, false);
-                ((TextView)header.findViewById(R.id.tvTimeHeader)).setText(med.time);
+                ((TextView)header.findViewById(R.id.tvTimeHeader)).setText(medAlarm.getTime());
                 layoutMeds.addView(header);
-                lastTime = med.time;
+                lastTime = medAlarm.getTime();
             }
             // İlaç kutusu ekle
             View medItem = inflater.inflate(R.layout.med_item, layoutMeds, false);
             TextView tvMedName = medItem.findViewById(R.id.tvMedName);
             TextView tvMedAmount = medItem.findViewById(R.id.tvMedAmount);
-            tvMedName.setText(med.name);
-            tvMedAmount.setText(med.amount);
+            tvMedName.setText(medAlarm.getMedicineName());
+            tvMedAmount.setText(medAlarm.getAmount());
             CheckBox cbTaken = medItem.findViewById(R.id.cbTaken);
+            
+            // İlaç durumuna göre checkbox'ı ayarla
+            cbTaken.setChecked(medAlarm.getState().equals("TAKEN"));
+            
             cbTaken.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
                     tvMedName.setPaintFlags(tvMedName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    medAlarm.setState("TAKEN");
                 } else {
                     tvMedName.setPaintFlags(tvMedName.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     tvMedAmount.setPaintFlags(tvMedAmount.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                    
+                    // Alarm tarihini Calendar nesnesine çevir
+                    Calendar alarmDate = Calendar.getInstance();
+                    String[] dateParts = medAlarm.getDate().split("-");
+                    alarmDate.set(Integer.parseInt(dateParts[0]), 
+                                Integer.parseInt(dateParts[1]) - 1, 
+                                Integer.parseInt(dateParts[2]));
+                    alarmDate.set(Calendar.HOUR_OF_DAY, 0);
+                    alarmDate.set(Calendar.MINUTE, 0);
+                    alarmDate.set(Calendar.SECOND, 0);
+                    alarmDate.set(Calendar.MILLISECOND, 0);
+                    
+                    // Tarihi karşılaştır ve durumu güncelle
+                    if (alarmDate.before(today)) {
+                        medAlarm.setState("MISSED");
+                    } else {
+                        medAlarm.setState("PENDING");
+                    }
                 }
+                // Veritabanı güncellemesi geçici olarak kaldırıldı
+                // medAlarmRepository.updateState(medAlarm.getId(), medAlarm.getState());
             });
             layoutMeds.addView(medItem);
         }
