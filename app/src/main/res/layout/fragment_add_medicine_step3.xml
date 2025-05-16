@@ -7,7 +7,7 @@
     android:paddingRight="24dp"
     android:paddingTop="16dp">
 
-    <TextView android:id="@+id/optionEveryDay" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Her gün X kez" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
+    <TextView android:id="@+id/optionEveryDay" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Her gün" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
     <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />
     <TextView android:id="@+id/optionCertainDays" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:text="Haftanın belirli günleri" android:textSize="18sp" android:paddingStart="16dp" android:paddingEnd="16dp" />
     <TextView android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" />

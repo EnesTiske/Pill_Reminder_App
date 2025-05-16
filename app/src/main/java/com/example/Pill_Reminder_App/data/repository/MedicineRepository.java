@@ -24,14 +24,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 
 public class MedicineRepository {
     private final FirebaseFirestore db;
+    private final CollectionReference medicinesCollection;
     private final DatabaseReference medicinesRef;
     private static final String COLLECTION_NAME = "medicines";
 
     public MedicineRepository() {
         this.db = FirebaseFirestore.getInstance();
+        medicinesCollection = db.collection(COLLECTION_NAME);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         medicinesRef = database.getReference("medicines");
     }
@@ -85,7 +89,7 @@ public class MedicineRepository {
             .addOnFailureListener(onFailure);
     }
 
-        public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
+    public void getAll(OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
         db.collection(COLLECTION_NAME)
             .get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -123,7 +127,7 @@ public class MedicineRepository {
                 .get());
 
             List<MedicineDTO> medicines = new ArrayList<>();
-            for (var doc : snapshot.getDocuments()) {
+            for (DocumentSnapshot doc : snapshot.getDocuments()) {
                 try {
                     MedicineDTO medicine = fromMap(doc.getId(), doc.getData());
                     medicines.add(medicine);
@@ -156,18 +160,18 @@ public class MedicineRepository {
 
     public void getByUserEmail(String userEmail, OnSuccessListener<List<MedicineDTO>> onSuccess, OnFailureListener onFailure) {
         db.collection(COLLECTION_NAME)
-            .whereEqualTo("userEmail", userEmail)
-            .get()
-            .addOnSuccessListener(queryDocumentSnapshots -> {
-                List<MedicineDTO> medicines = new ArrayList<>();
-                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    Map<String, Object> data = document.getData();
-                    MedicineDTO medicine = fromMap(document.getId(), data);
-                    medicines.add(medicine);
-                }
-                onSuccess.onSuccess(medicines);
-            })
-            .addOnFailureListener(onFailure);
+                .whereEqualTo("userEmail", userEmail)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<MedicineDTO> medicines = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        Map<String, Object> data = document.getData();
+                        MedicineDTO medicine = fromMap(document.getId(), data);
+                        medicines.add(medicine);
+                    }
+                    onSuccess.onSuccess(medicines);
+                })
+                .addOnFailureListener(onFailure);
     }
 
     private MedicineDTO fromMap(String id, Map<String, Object> map) {
@@ -321,5 +325,23 @@ public class MedicineRepository {
                 listener.onError(databaseError.getMessage());
             }
         });
+    }
+
+    public Task<QuerySnapshot> getMedicines(String userId) {
+        return medicinesCollection
+                .whereEqualTo("userId", userId)
+                .get();
+    }
+
+    public Task<Void> addMedicine(MedicineDTO medicine) {
+        return medicinesCollection.document().set(medicine);
+    }
+
+    public Task<Void> updateMedicine(String medicineId, MedicineDTO medicine) {
+        return medicinesCollection.document(medicineId).set(medicine);
+    }
+
+    public Task<Void> deleteMedicine(String medicineId) {
+        return medicinesCollection.document(medicineId).delete();
     }
 }
